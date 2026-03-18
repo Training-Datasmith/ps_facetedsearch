@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 // FacetedSearch autoloader
 require __DIR__ . '/../../vendor/autoload.php';
 

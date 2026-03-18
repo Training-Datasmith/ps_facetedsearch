@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
@@ -29,7 +31,7 @@ use Ps_Facetedsearch;
  */
 class HookDispatcher
 {
-    const CLASSES = [
+    public const CLASSES = [
         Hook\Attribute::class,
         Hook\AttributeGroup::class,
         Hook\Category::class,

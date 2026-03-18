@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
@@ -22,7 +24,7 @@ namespace PrestaShop\Module\FacetedSearch\Definition;
 
 class Availability
 {
-    const IN_STOCK = 2;
-    const AVAILABLE = 1;
-    const NOT_AVAILABLE = 0;
+    public const IN_STOCK = 2;
+    public const AVAILABLE = 1;
+    public const NOT_AVAILABLE = 0;
 }

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
@@ -26,7 +28,8 @@ function upgrade_module_3_8_0($module)
     $module->registerHook('actionProductPreferencesPageStockSave');
 
     return Db::getInstance()->execute(
-      'ALTER TABLE `' . _DB_PREFIX_ . 'layered_price_index` 
+        'ALTER TABLE `' . _DB_PREFIX_ . 'layered_price_index` 
       CHANGE `price_min` `price_min` decimal(20,6) NOT NULL,
-      CHANGE `price_max` `price_max` decimal(20,6) NOT NULL;');
+      CHANGE `price_max` `price_max` decimal(20,6) NOT NULL;'
+    );
 }

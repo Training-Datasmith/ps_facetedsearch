@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
@@ -26,16 +28,19 @@ function upgrade_module_3_12_0($module)
     // Add availabilility to allowed types
     Db::getInstance()->execute(
         'ALTER TABLE `' . _DB_PREFIX_ . 'layered_category`
-        CHANGE `type` `type` ENUM(\'category\',\'id_feature\',\'id_attribute_group\',\'quantity\',\'availability\',\'condition\',\'manufacturer\',\'weight\',\'price\') NOT NULL;');
+        CHANGE `type` `type` ENUM(\'category\',\'id_feature\',\'id_attribute_group\',\'quantity\',\'availability\',\'condition\',\'manufacturer\',\'weight\',\'price\') NOT NULL;'
+    );
 
     // Upgrade all generated filters
     Db::getInstance()->execute(
-        'UPDATE `' . _DB_PREFIX_ . 'layered_category` SET type=\'availability\' WHERE type=\'quantity\';');
+        'UPDATE `' . _DB_PREFIX_ . 'layered_category` SET type=\'availability\' WHERE type=\'quantity\';'
+    );
 
     // Remove the old enum from types
     Db::getInstance()->execute(
         'ALTER TABLE `' . _DB_PREFIX_ . 'layered_category`
-        CHANGE `type` `type` ENUM(\'category\',\'id_feature\',\'id_attribute_group\',\'availability\',\'condition\',\'manufacturer\',\'weight\',\'price\') NOT NULL;');
+        CHANGE `type` `type` ENUM(\'category\',\'id_feature\',\'id_attribute_group\',\'availability\',\'condition\',\'manufacturer\',\'weight\',\'price\') NOT NULL;'
+    );
 
     // Flush block cache
     $module->invalidateLayeredFilterBlockCache();

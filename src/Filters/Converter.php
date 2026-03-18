@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
@@ -34,29 +36,29 @@ use PrestaShop\PrestaShop\Core\Product\Search\ProductSearchQuery;
 
 class Converter
 {
-    const WIDGET_TYPE_CHECKBOX = 0;
-    const WIDGET_TYPE_RADIO = 1;
-    const WIDGET_TYPE_DROPDOWN = 2;
-    const WIDGET_TYPE_SLIDER = 3;
+    public const WIDGET_TYPE_CHECKBOX = 0;
+    public const WIDGET_TYPE_RADIO = 1;
+    public const WIDGET_TYPE_DROPDOWN = 2;
+    public const WIDGET_TYPE_SLIDER = 3;
 
-    const TYPE_ATTRIBUTE_GROUP = 'id_attribute_group';
-    const TYPE_AVAILABILITY = 'availability';
-    const TYPE_CATEGORY = 'category';
-    const TYPE_CONDITION = 'condition';
-    const TYPE_FEATURE = 'id_feature';
-    const TYPE_MANUFACTURER = 'manufacturer';
-    const TYPE_PRICE = 'price';
-    const TYPE_WEIGHT = 'weight';
-    const TYPE_EXTRAS = 'extras';
+    public const TYPE_ATTRIBUTE_GROUP = 'id_attribute_group';
+    public const TYPE_AVAILABILITY = 'availability';
+    public const TYPE_CATEGORY = 'category';
+    public const TYPE_CONDITION = 'condition';
+    public const TYPE_FEATURE = 'id_feature';
+    public const TYPE_MANUFACTURER = 'manufacturer';
+    public const TYPE_PRICE = 'price';
+    public const TYPE_WEIGHT = 'weight';
+    public const TYPE_EXTRAS = 'extras';
 
-    const PROPERTY_URL_NAME = 'url_name';
-    const PROPERTY_COLOR = 'color';
-    const PROPERTY_TEXTURE = 'texture';
+    public const PROPERTY_URL_NAME = 'url_name';
+    public const PROPERTY_COLOR = 'color';
+    public const PROPERTY_TEXTURE = 'texture';
 
     /**
      * @var array
      */
-    const RANGE_FILTERS = [self::TYPE_PRICE, self::TYPE_WEIGHT];
+    public const RANGE_FILTERS = [self::TYPE_PRICE, self::TYPE_WEIGHT];
 
     /**
      * @var Context
@@ -355,36 +357,36 @@ class Converter
                     }
                     break;
                 case self::TYPE_EXTRAS:
-                        if (!isset($receivedFilters[$filterLabel])) {
-                            // No need to filter if no information
-                            continue 2;
-                        }
+                    if (!isset($receivedFilters[$filterLabel])) {
+                        // No need to filter if no information
+                        continue 2;
+                    }
 
-                        $extrasOptions = [
-                            $this->context->getTranslator()->trans(
-                                'New product',
-                                [],
-                                'Modules.Facetedsearch.Shop'
-                            ) => 'new',
-                            $this->context->getTranslator()->trans(
-                                'On sale',
-                                [],
-                                'Modules.Facetedsearch.Shop'
-                            ) => 'sale',
-                            $this->context->getTranslator()->trans(
-                                'Discounted',
-                                [],
-                                'Modules.Facetedsearch.Shop'
-                            ) => 'discount',
-                        ];
+                    $extrasOptions = [
+                        $this->context->getTranslator()->trans(
+                            'New product',
+                            [],
+                            'Modules.Facetedsearch.Shop'
+                        ) => 'new',
+                        $this->context->getTranslator()->trans(
+                            'On sale',
+                            [],
+                            'Modules.Facetedsearch.Shop'
+                        ) => 'sale',
+                        $this->context->getTranslator()->trans(
+                            'Discounted',
+                            [],
+                            'Modules.Facetedsearch.Shop'
+                        ) => 'discount',
+                    ];
 
-                        $searchFilters[$filter['type']] = [];
-                        foreach ($extrasOptions as $extrasOption => $optionId) {
-                            if (isset($receivedFilters[$filterLabel]) && in_array($extrasOption, $receivedFilters[$filterLabel])) {
-                                $searchFilters[$filter['type']][] = $optionId;
-                            }
+                    $searchFilters[$filter['type']] = [];
+                    foreach ($extrasOptions as $extrasOption => $optionId) {
+                        if (isset($receivedFilters[$filterLabel]) && in_array($extrasOption, $receivedFilters[$filterLabel])) {
+                            $searchFilters[$filter['type']][] = $optionId;
                         }
-                        break;
+                    }
+                    break;
                 case self::TYPE_FEATURE:
                     $features = $this->dataAccessor->getFeatures($idLang);
                     foreach ($features as $feature) {

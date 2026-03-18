@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
@@ -35,28 +37,28 @@ class Ps_Facetedsearch extends Module implements WidgetInterface
     /**
      * @var string Name of the module running on PS 1.6.x. Used for data migration.
      */
-    const PS_16_EQUIVALENT_MODULE = 'blocklayered';
+    public const PS_16_EQUIVALENT_MODULE = 'blocklayered';
 
     /**
      * Lock indexation if too many products
      *
      * @var int
      */
-    const LOCK_TOO_MANY_PRODUCTS = 5000;
+    public const LOCK_TOO_MANY_PRODUCTS = 5000;
 
     /**
      * Lock template filter creation if too many products
      *
      * @var int
      */
-    const LOCK_TEMPLATE_CREATION = 20000;
+    public const LOCK_TEMPLATE_CREATION = 20000;
 
     /**
      * US iso code, used to prevent taxes usage while computing prices
      *
      * @var array
      */
-    const ISO_CODE_TAX_FREE = [
+    public const ISO_CODE_TAX_FREE = [
         'US',
     ];
 
@@ -65,7 +67,7 @@ class Ps_Facetedsearch extends Module implements WidgetInterface
      *
      * @var int
      */
-    const DECIMAL_DIGITS = 6;
+    public const DECIMAL_DIGITS = 6;
 
     /**
      * @var array List of controllers supported by this module

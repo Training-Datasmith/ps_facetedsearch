@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
@@ -33,8 +35,8 @@ use PrestaShop\PrestaShop\Core\Product\Search\ProductSearchQuery;
 
 class Search
 {
-    const STOCK_MANAGEMENT_FILTER = 'with_stock_management';
-    const HIGHLIGHTS_FILTER = 'extras';
+    public const STOCK_MANAGEMENT_FILTER = 'with_stock_management';
+    public const HIGHLIGHTS_FILTER = 'extras';
 
     /**
      * @var bool
@@ -233,7 +235,7 @@ class Search
                                 ['quantity', [0], '<='],
                                 ['out_of_stock', $this->psOrderOutOfStock ? [0] : [0, 2], '='],
                             ];
-                        // Available
+                            // Available
                         } elseif ($filterValues[0] == Availability::AVAILABLE) {
                             $operationsFilter[] = [
                                 ['out_of_stock', $this->psOrderOutOfStock ? [1, 2] : [1], '='],
@@ -241,7 +243,7 @@ class Search
                             $operationsFilter[] = [
                                 ['quantity', [0], '>'],
                             ];
-                        // In stock
+                            // In stock
                         } elseif ($filterValues[0] == Availability::IN_STOCK) {
                             $operationsFilter[] = [
                                 ['quantity', [0], '>'],
@@ -252,7 +254,7 @@ class Search
                         // Not available and available, we show everything
                         if (in_array(Availability::NOT_AVAILABLE, $filterValues) && in_array(Availability::AVAILABLE, $filterValues)) {
                             break;
-                        // Not available or in stock
+                            // Not available or in stock
                         } elseif (in_array(Availability::NOT_AVAILABLE, $filterValues) && in_array(Availability::IN_STOCK, $filterValues)) {
                             $operationsFilter[] = [
                                 ['quantity', [0], '<='],
@@ -261,7 +263,7 @@ class Search
                             $operationsFilter[] = [
                                 ['quantity', [0], '>'],
                             ];
-                        // Available or in stock
+                            // Available or in stock
                         } elseif (in_array(Availability::AVAILABLE, $filterValues) && in_array(Availability::IN_STOCK, $filterValues)) {
                             $operationsFilter[] = [
                                 ['out_of_stock', $this->psOrderOutOfStock ? [1, 2] : [1], '='],

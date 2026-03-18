@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
@@ -162,10 +164,10 @@ class CoreSearchBackport
 
             while (!($result = $db->executeS($sql . "'" . $sql_param_search . "';", true, false))) {
                 if (
-          !$psFuzzySearch
-          || $fuzzyLoop++ > $fuzzyMaxLoop
-          || !($sql_param_search = Search::findClosestWeightestWord($context, $word))
-        ) {
+                    !$psFuzzySearch
+                    || $fuzzyLoop++ > $fuzzyMaxLoop
+                    || !($sql_param_search = Search::findClosestWeightestWord($context, $word))
+                ) {
                     break;
                 }
             }
@@ -194,7 +196,7 @@ class CoreSearchBackport
         }
 
         $results = $db->executeS(
-      'SELECT DISTINCT cp.`id_product` ' .
+            'SELECT DISTINCT cp.`id_product` ' .
         'FROM `' . _DB_PREFIX_ . 'category_product` cp ' .
         (Group::isFeatureActive() ? 'INNER JOIN `' . _DB_PREFIX_ . 'category_group` cg ON cp.`id_category` = cg.`id_category`' : '') . ' ' .
         'INNER JOIN `' . _DB_PREFIX_ . 'category` c ON cp.`id_category` = c.`id_category` ' .
@@ -204,9 +206,9 @@ class CoreSearchBackport
         'AND product_shop.`active` = 1 ' .
         'AND product_shop.`visibility` IN ("both", "search") ' .
         'AND product_shop.indexed = 1 ' . $sqlGroups,
-      true,
-      false
-    );
+            true,
+            false
+        );
 
         $eligibleProducts = array_column($results, 'id_product');
 
@@ -252,10 +254,10 @@ class CoreSearchBackport
 
             while (!($result = $db->executeS($sql . "'" . $sql_param_search . "';", true, false))) {
                 if (
-          !$psFuzzySearch
-          || $fuzzyLoop++ > $fuzzyMaxLoop
-          || !($sql_param_search = Search::findClosestWeightestWord($context, $word))
-        ) {
+                    !$psFuzzySearch
+                    || $fuzzyLoop++ > $fuzzyMaxLoop
+                    || !($sql_param_search = Search::findClosestWeightestWord($context, $word))
+                ) {
                     break;
                 }
             }
@@ -284,7 +286,7 @@ class CoreSearchBackport
         }
 
         $results = $db->executeS(
-      'SELECT DISTINCT cp.`id_product` ' .
+            'SELECT DISTINCT cp.`id_product` ' .
         'FROM `' . _DB_PREFIX_ . 'category_product` cp ' .
         (Group::isFeatureActive() ? 'INNER JOIN `' . _DB_PREFIX_ . 'category_group` cg ON cp.`id_category` = cg.`id_category`' : '') . ' ' .
         'INNER JOIN `' . _DB_PREFIX_ . 'category` c ON cp.`id_category` = c.`id_category` ' .
@@ -295,9 +297,9 @@ class CoreSearchBackport
         'AND product_shop.`visibility` IN ("both", "search") ' .
         'AND product_shop.indexed = 1 ' .
         'AND cp.id_product IN (' . implode(',', $eligibleProducts2) . ')' . $sqlGroups,
-      true,
-      false
-    );
+            true,
+            false
+        );
 
         return array_column($results, 'id_product');
     }
@@ -345,10 +347,10 @@ class CoreSearchBackport
 
                 while (!($result = $db->executeS($sql . "'" . $sql_param_search . "';", true, false))) {
                     if (
-            !$psFuzzySearch
-            || $fuzzyLoop++ > $fuzzyMaxLoop
-            || !($sql_param_search = Search::findClosestWeightestWord($context, $word))
-          ) {
+                        !$psFuzzySearch
+                        || $fuzzyLoop++ > $fuzzyMaxLoop
+                        || !($sql_param_search = Search::findClosestWeightestWord($context, $word))
+                    ) {
                         break;
                     }
                 }
@@ -411,8 +413,8 @@ class CoreSearchBackport
             'AND product_shop.indexed = 1 ' .
             'AND cp.id_product IN (' . implode(',', $eligibleProducts2Full) . ')' . $sqlGroups . '
             ORDER BY position DESC, p.id_product ASC',
-        true,
-        false
+            true,
+            false
         );
 
         return array_column($results, 'id_product');

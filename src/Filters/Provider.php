@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
@@ -53,7 +55,7 @@ class Provider
     {
         if (empty($this->filters)) {
             $this->filters = $this->database->executeS(
-            'SELECT type, id_value, filter_show_limit, filter_type FROM ' . _DB_PREFIX_ . 'layered_category
+                'SELECT type, id_value, filter_show_limit, filter_type FROM ' . _DB_PREFIX_ . 'layered_category
             WHERE controller = \'' . $query->getQueryType() . '\'
             AND id_category = ' . ($query->getQueryType() == 'category' ? (int) $query->getIdCategory() : 0) . '
             AND id_shop = ' . $idShop . '

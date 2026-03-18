@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Defines constants required by PrestaShop config (e.g. defines_uri.inc.php) when running
  * PHPStan outside a full request. Loaded via auto_prepend_file in CI for 9.x jobs.

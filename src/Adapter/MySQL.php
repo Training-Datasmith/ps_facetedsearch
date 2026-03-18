@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
@@ -32,17 +34,17 @@ class MySQL extends AbstractAdapter
     /**
      * @var string
      */
-    const TYPE = 'MySQL';
+    public const TYPE = 'MySQL';
 
     /**
      * @var string
      */
-    const LEFT_JOIN = 'LEFT JOIN';
+    public const LEFT_JOIN = 'LEFT JOIN';
 
     /**
      * @var string
      */
-    const INNER_JOIN = 'INNER JOIN';
+    public const INNER_JOIN = 'INNER JOIN';
 
     /**
      * {@inheritdoc}
@@ -104,7 +106,7 @@ class MySQL extends AbstractAdapter
         // If this query IS the initial population (the base table), we are selecting from product table
         if ($this->getInitialPopulation() === null) {
             $referenceTable = _DB_PREFIX_ . 'product';
-        // If not, we will call this function again but for the initial population
+            // If not, we will call this function again but for the initial population
         } else {
             $referenceTable = '(' . $this->getInitialPopulation()->getQuery() . ')';
         }

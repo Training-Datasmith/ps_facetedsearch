@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
@@ -26,7 +28,8 @@ function upgrade_module_3_14_0(Ps_Facetedsearch $module)
     // Add availabilility to allowed types
     Db::getInstance()->execute(
         'ALTER TABLE `' . _DB_PREFIX_ . 'layered_category`
-        CHANGE `type` `type` ENUM(\'category\',\'id_feature\',\'id_attribute_group\',\'availability\',\'condition\',\'manufacturer\',\'weight\',\'price\',\'extras\') NOT NULL;');
+        CHANGE `type` `type` ENUM(\'category\',\'id_feature\',\'id_attribute_group\',\'availability\',\'condition\',\'manufacturer\',\'weight\',\'price\',\'extras\') NOT NULL;'
+    );
 
     return true;
 }
