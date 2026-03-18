@@ -46,8 +46,6 @@ class Provider
     /**
      * Get filters for current search query
      *
-     * @param ProductSearchQuery $query
-     * @param int $idShop
      *
      * @return array Filters
      */

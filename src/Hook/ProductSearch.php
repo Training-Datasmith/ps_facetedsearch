@@ -39,11 +39,9 @@ class ProductSearch extends AbstractHook
     /**
      * This method returns the search provider to the controller who requested it.
      *
-     * @param array $params
      *
-     * @return SearchProvider|null
      */
-    public function productSearchProvider(array $params)
+    public function productSearchProvider(array $params): ?\PrestaShop\Module\FacetedSearch\Product\SearchProvider
     {
         /*
          * Backward compatibility, required for versions < 8.0
@@ -119,11 +117,9 @@ class ProductSearch extends AbstractHook
     /**
      * Assign missing queryType, required for PS versions < 8.0
      *
-     * @param ProductSearchQuery $query
      *
-     * @return ProductSearchQuery
      */
-    private function assignMissingQueryType(ProductSearchQuery $query)
+    private function assignMissingQueryType(ProductSearchQuery $query): ProductSearchQuery
     {
         if (!empty($query->getIdCategory())) {
             $query->setQueryType('category');

@@ -35,9 +35,6 @@ class UrlSegmentValidator extends ConstraintValidator
      */
     private $tools;
 
-    /**
-     * @param Tools $tools
-     */
     public function __construct(Tools $tools)
     {
         $this->tools = $tools;
@@ -46,7 +43,7 @@ class UrlSegmentValidator extends ConstraintValidator
     /**
      * {@inheritdoc}
      */
-    public function validate($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint): void
     {
         if (!$constraint instanceof UrlSegment) {
             throw new UnexpectedTypeException($constraint, UrlSegment::class);

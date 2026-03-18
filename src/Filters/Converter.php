@@ -97,7 +97,10 @@ class Converter
         $this->provider = $provider;
     }
 
-    public function getFacetsFromFilterBlocks(array $filterBlocks)
+    /**
+     * @return \PrestaShop\PrestaShop\Core\Product\Search\Facet[]
+     */
+    public function getFacetsFromFilterBlocks(array $filterBlocks): array
     {
         $facets = [];
 
@@ -242,11 +245,9 @@ class Converter
      * Filters that are found (if any) will be later used in initSearch method, along
      * with some predefined ones related the the controller we are on.
      *
-     * @param ProductSearchQuery $query
      *
-     * @return array
      */
-    public function createFacetedSearchFiltersFromQuery(ProductSearchQuery $query)
+    public function createFacetedSearchFiltersFromQuery(ProductSearchQuery $query): array
     {
         $idShop = (int) $this->context->shop->id;
         $idLang = (int) $this->context->language->id;
@@ -454,7 +455,7 @@ class Converter
                              * Categories deeper in the tree will never be found. This could be fixed by providing a unique ID
                              * to the URL.
                              */
-                            $categories = Category::searchByNameAndParentCategoryId($idLang, $queryFilter, (int) $idCategory);
+                            $categories = Category::searchByNameAndParentCategoryId($idLang, $queryFilter, $idCategory);
                             if ($categories) {
                                 $searchFilters[$filter['type']][] = $categories['id_category'];
                             }
@@ -523,11 +524,9 @@ class Converter
      * Hide entries with 0 results
      * Hide depending of show limit parameter
      *
-     * @param array $filters
      *
-     * @return array
      */
-    private function hideZeroValuesAndShowLimit(array $filters, $showLimit)
+    private function hideZeroValuesAndShowLimit(array $filters, int $showLimit): array
     {
         $count = 0;
         foreach ($filters as $filter) {
@@ -547,8 +546,6 @@ class Converter
     /**
      * Sort filters by magnitude
      *
-     * @param Filter $a
-     * @param Filter $b
      *
      * @return int
      */
@@ -567,12 +564,9 @@ class Converter
     /**
      * Sort filters by label
      *
-     * @param Filter $a
-     * @param Filter $b
      *
-     * @return int
      */
-    private function sortFiltersByLabel(Filter $a, Filter $b)
+    private function sortFiltersByLabel(Filter $a, Filter $b): int
     {
         return strnatcasecmp($a->getLabel(), $b->getLabel());
     }

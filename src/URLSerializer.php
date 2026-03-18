@@ -29,13 +29,9 @@ class URLSerializer
     /**
      * Add filter
      *
-     * @param array $facetFilters
-     * @param Filter $facetFilter
-     * @param Facet $facet
      *
-     * @return array
      */
-    public function addFilterToFacetFilters(array $facetFilters, Filter $facetFilter, Facet $facet)
+    public function addFilterToFacetFilters(array $facetFilters, Filter $facetFilter, Facet $facet): array
     {
         $facetLabel = $this->getFacetLabel($facet);
         $filterLabel = $this->getFilterLabel($facetFilter);
@@ -44,8 +40,8 @@ class URLSerializer
             $facetValue = $facet->getProperty('values');
             $facetFilters[$facetLabel] = [
                 $facetFilter->getProperty('symbol'),
-                isset($facetValue[0]) ? $facetValue[0] : $facet->getProperty('min'),
-                isset($facetValue[1]) ? $facetValue[1] : $facet->getProperty('max'),
+                $facetValue[0] ?? $facet->getProperty('min'),
+                $facetValue[1] ?? $facet->getProperty('max'),
             ];
         } else {
             $facetFilters[$facetLabel][$filterLabel] = $filterLabel;
@@ -57,13 +53,10 @@ class URLSerializer
     /**
      * Remove filter
      *
-     * @param array $facetFilters
-     * @param Filter $facetFilter
      * @param Facet $facet
      *
-     * @return array
      */
-    public function removeFilterFromFacetFilters(array $facetFilters, Filter $facetFilter, $facet)
+    public function removeFilterFromFacetFilters(array $facetFilters, Filter $facetFilter, $facet): array
     {
         $facetLabel = $this->getFacetLabel($facet);
 
@@ -82,10 +75,8 @@ class URLSerializer
 
     /**
      * Get active facet filters
-     *
-     * @return array
      */
-    public function getActiveFacetFiltersFromFacets(array $facets)
+    public function getActiveFacetFiltersFromFacets(array $facets): array
     {
         $facetFilters = [];
         foreach ($facets as $facet) {
@@ -117,7 +108,6 @@ class URLSerializer
     /**
      * Get Facet label
      *
-     * @param Facet $facet
      *
      * @return string
      */
@@ -133,7 +123,6 @@ class URLSerializer
     /**
      * Get Facet Filter label
      *
-     * @param Filter $facetFilter
      *
      * @return string
      */
@@ -147,8 +136,6 @@ class URLSerializer
     }
 
     /**
-     * @param array $fragment
-     *
      * @return string
      */
     public function serialize(array $fragment)
@@ -164,10 +151,8 @@ class URLSerializer
 
     /**
      * @param string $string
-     *
-     * @return array
      */
-    public function unserialize($string)
+    public function unserialize($string): array
     {
         $fragment = [];
         $parts = $this->unserializeListOfStrings($string, '/');
@@ -184,12 +169,10 @@ class URLSerializer
      * @param string $separator the string separator
      * @param string $escape the string escape
      * @param array $list
-     *
-     * @return string
      */
-    private function serializeListOfStrings($list, $separator, $escape = '\\')
+    private function serializeListOfStrings($list, string $separator, $escape = '\\'): string
     {
-        return implode($separator, array_map(function ($item) use ($separator, $escape) {
+        return implode($separator, array_map(function ($item) use ($separator, $escape): string {
             return strtr(
                 $item,
                 [
@@ -203,10 +186,8 @@ class URLSerializer
      * @param string $separator the string separator
      * @param string $escape the string escape
      * @param string $string the UTF8 string
-     *
-     * @return array
      */
-    private function unserializeListOfStrings($string, $separator, $escape = '\\')
+    private function unserializeListOfStrings($string, string $separator, $escape = '\\'): array
     {
         $list = [];
         $currentString = '';

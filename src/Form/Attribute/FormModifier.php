@@ -49,7 +49,7 @@ class FormModifier
         $this->translator = $translator;
     }
 
-    public function modify(FormBuilderInterface $formBuilder)
+    public function modify(FormBuilderInterface $formBuilder): void
     {
         $invalidCharsHint = $this->translator->trans(
             'Invalid characters: <>;=#{}_',

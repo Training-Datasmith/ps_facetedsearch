@@ -43,10 +43,8 @@ class AttributeGroup extends AbstractHook
      * Hook for modifying attribute group form formBuilder
      *
      * @since PrestaShop 9.0.0
-     *
-     * @param array $params
      */
-    public function actionAttributeGroupFormBuilderModifier(array $params)
+    public function actionAttributeGroupFormBuilderModifier(array $params): void
     {
         $formModifier = new FormModifier($this->context->getTranslator());
         $formModifier->modify($params['form_builder']);
@@ -56,10 +54,8 @@ class AttributeGroup extends AbstractHook
      * Hook that provides extra data in the form.
      *
      * @since PrestaShop 9.0.0
-     *
-     * @param array $params
      */
-    public function actionAttributeGroupFormDataProviderData(array $params)
+    public function actionAttributeGroupFormDataProviderData(array $params): void
     {
         $formDataProvider = new FormDataProvider($this->database);
         $attributeGroupData = $formDataProvider->getData($params);
@@ -71,8 +67,6 @@ class AttributeGroup extends AbstractHook
      * Hook after creation form is handled in migrated page.
      *
      * @since PrestaShop 9.0.0
-     *
-     * @param array $params
      */
     public function actionAfterCreateAttributeGroupFormHandler(array $params): void
     {
@@ -83,8 +77,6 @@ class AttributeGroup extends AbstractHook
      * Hook after edition form is handled in migrated page.
      *
      * @since PrestaShop 9.0.0
-     *
-     * @param array $params
      */
     public function actionAfterUpdateAttributeGroupFormHandler(array $params): void
     {
@@ -93,10 +85,8 @@ class AttributeGroup extends AbstractHook
 
     /**
      * After save Attributes group
-     *
-     * @param array $params
      */
-    public function actionAttributeGroupSave(array $params)
+    public function actionAttributeGroupSave(array $params): void
     {
         if (empty($params['id_attribute_group']) || Tools::getValue('layered_indexable') === false) {
             return;
@@ -123,10 +113,8 @@ class AttributeGroup extends AbstractHook
 
     /**
      * After delete attribute group
-     *
-     * @param array $params
      */
-    public function actionAttributeGroupDelete(array $params)
+    public function actionAttributeGroupDelete(array $params): void
     {
         if (empty($params['id_attribute_group'])) {
             return;
@@ -145,10 +133,8 @@ class AttributeGroup extends AbstractHook
 
     /**
      * Post process attribute group
-     *
-     * @param array $params
      */
-    public function displayAttributeGroupPostProcess(array $params)
+    public function displayAttributeGroupPostProcess(array $params): void
     {
         $this->module->checkLinksRewrite($params);
     }
@@ -156,7 +142,6 @@ class AttributeGroup extends AbstractHook
     /**
      * Attribute group form
      *
-     * @param array $params
      *
      * @return string
      */
@@ -191,8 +176,6 @@ class AttributeGroup extends AbstractHook
     /**
      * This is the common save method, the calling methods just need to format the form data appropriately
      * depending on the page being migrated or not.
-     *
-     * @param array $formData
      */
     private function save(array $formData): void
     {

@@ -47,7 +47,7 @@ class MySQL extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    public function getMinMaxPriceValue()
+    public function getMinMaxPriceValue(): array
     {
         $mysqlAdapter = $this->getFilteredSearchAdapter();
         $mysqlAdapter->copyFilters($this);
@@ -62,7 +62,7 @@ class MySQL extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    public function getFilteredSearchAdapter($resetFilter = null, $skipInitialPopulation = false)
+    public function getFilteredSearchAdapter($resetFilter = null, $skipInitialPopulation = false): self
     {
         $mysqlAdapter = new self();
         if ($this->getInitialPopulation() !== null && !$skipInitialPopulation) {
@@ -87,10 +87,8 @@ class MySQL extends AbstractAdapter
 
     /**
      * Construct the final sql query
-     *
-     * @return string
      */
-    public function getQuery()
+    public function getQuery(): string
     {
         // Prepare mapping for joined tables
         $filterToTableMapping = $this->getFieldMapping();
@@ -150,10 +148,8 @@ class MySQL extends AbstractAdapter
 
     /**
      * Define the mapping between fields and tables
-     *
-     * @return array
      */
-    protected function getFieldMapping()
+    protected function getFieldMapping(): array
     {
         $stockCondition = StockAvailable::addSqlShopRestriction(
             null,
@@ -161,7 +157,7 @@ class MySQL extends AbstractAdapter
             'sa'
         );
 
-        $filterToTableMapping = [
+        return [
             'id_product_attribute' => [
                 'tableName' => 'product_attribute',
                 'tableAlias' => 'pa',
@@ -335,19 +331,16 @@ class MySQL extends AbstractAdapter
                 'joinType' => self::LEFT_JOIN,
             ],
         ];
-
-        return $filterToTableMapping;
     }
 
     /**
      * Get the joined and escaped value from an multi-dimensional array
      *
      * @param string $separator
-     * @param array $values
      *
      * @return string Escaped string value
      */
-    protected function getJoinedEscapedValue($separator, array $values)
+    protected function getJoinedEscapedValue($separator, array $values): string
     {
         foreach ($values as $key => $value) {
             if (is_array($value)) {
@@ -365,7 +358,6 @@ class MySQL extends AbstractAdapter
     /**
      * Compute the orderby fields, adding the proper alias that will be added to the final query
      *
-     * @param array $filterToTableMapping
      *
      * @return string
      */
@@ -421,12 +413,10 @@ class MySQL extends AbstractAdapter
     /**
      * Sort product list: InStock, OOPS with qty 0, OutOfStock
      *
-     * @param string $orderField
      * @param array $filterToTableMapping
      *
-     * @return string
      */
-    protected function computeShowLast($orderField, $filterToTableMapping)
+    protected function computeShowLast(string $orderField, $filterToTableMapping): string
     {
         // allow only if feature is enabled & it is main product list query (caller ensures $orderField is non-empty)
         if ($this->getInitialPopulation() === null
@@ -445,8 +435,6 @@ class MySQL extends AbstractAdapter
          * Default behaviour when out of stock
          * 0 - when deny orders
          * 1 - when allow orders
-         *
-         * @var int
          */
         $isAvailableWhenOutOfStock = (int) Product::isAvailableWhenOutOfStock(2);
 
@@ -462,22 +450,19 @@ class MySQL extends AbstractAdapter
             ':byOutOfStockLast AND FIELD(:field, :value) :direction'
         );
 
-        $orderField = $byOutOfStockLast . ', '
+        return $byOutOfStockLast . ', '
             . $byOOPS . ', '
             . $orderField;
-
-        return $orderField;
     }
 
     /**
      * Add alias to table field name
      *
      * @param string $fieldName
-     * @param array $filterToTableMapping
      *
      * @return string Table Field name with an alias
      */
-    protected function computeFieldName($fieldName, $filterToTableMapping, $sortByField = false)
+    protected function computeFieldName($fieldName, array $filterToTableMapping, $sortByField = false): string
     {
         if (array_key_exists($fieldName, $filterToTableMapping)
             && (
@@ -489,7 +474,7 @@ class MySQL extends AbstractAdapter
             )
         ) {
             $joinMapping = $filterToTableMapping[$fieldName];
-            $fieldName = $joinMapping['tableAlias'] . '.' . (isset($joinMapping['fieldName']) ? $joinMapping['fieldName'] : $fieldName);
+            $fieldName = $joinMapping['tableAlias'] . '.' . ($joinMapping['fieldName'] ?? $fieldName);
             if ($sortByField === false) {
                 $fieldName .= isset($joinMapping['fieldAlias']) ? ' as ' . $joinMapping['fieldAlias'] : '';
             }
@@ -509,15 +494,13 @@ class MySQL extends AbstractAdapter
     /**
      * Compute the select fields, adding the proper alias that will be added to the final query
      *
-     * @param array $filterToTableMapping
      *
-     * @return array
      */
-    protected function computeSelectFields(array $filterToTableMapping)
+    protected function computeSelectFields(array $filterToTableMapping): array
     {
         // Add already added select fields to current query
         $selectFields = [];
-        foreach ($this->getSelectFields() as $key => $selectField) {
+        foreach ($this->getSelectFields() as $selectField) {
             $selectFields[] = $this->computeFieldName($selectField, $filterToTableMapping);
         }
 
@@ -527,11 +510,9 @@ class MySQL extends AbstractAdapter
     /**
      * Computer the where conditions that will be added to the final query
      *
-     * @param array $filterToTableMapping
      *
-     * @return array
      */
-    protected function computeWhereConditions(array $filterToTableMapping)
+    protected function computeWhereConditions(array $filterToTableMapping): array
     {
         $whereConditions = [];
         $operationIdx = 0;
@@ -549,7 +530,7 @@ class MySQL extends AbstractAdapter
                         $selectAlias = $joinMapping['tableAlias'] .
                                      ($operationIdx === 0 ? '' : '_' . $operationIdx) .
                                      ($idx === 0 ? '' : '_' . $idx);
-                        $operation[0] = isset($joinMapping['fieldName']) ? $joinMapping['fieldName'] : $operation[0];
+                        $operation[0] = $joinMapping['fieldName'] ?? $operation[0];
                     }
 
                     if (count($values) === 1) {
@@ -574,7 +555,7 @@ class MySQL extends AbstractAdapter
             if (array_key_exists($filterName, $filterToTableMapping)) {
                 $joinMapping = $filterToTableMapping[$filterName];
                 $selectAlias = $joinMapping['tableAlias'];
-                $filterName = isset($joinMapping['fieldName']) ? $joinMapping['fieldName'] : $filterName;
+                $filterName = $joinMapping['fieldName'] ?? $filterName;
             }
 
             foreach ($filterContent as $operator => $values) {
@@ -641,11 +622,9 @@ class MySQL extends AbstractAdapter
     /**
      * Compute the joinConditions needed depending on the fields required in select, where, groupby & orderby fields
      *
-     * @param array $filterToTableMapping
      *
-     * @return ArrayCollection
      */
-    protected function computeJoinConditions(array $filterToTableMapping)
+    protected function computeJoinConditions(array $filterToTableMapping): \Doctrine\Common\Collections\ArrayCollection
     {
         $joinList = new ArrayCollection();
 
@@ -692,11 +671,9 @@ class MySQL extends AbstractAdapter
     /**
      * Helper to add tables infos to the join list.
      *
-     * @param ArrayCollection $joinList
      * @param array|ArrayCollection $list
-     * @param array $filterToTableMapping
      */
-    private function addJoinList(ArrayCollection $joinList, $list, array $filterToTableMapping)
+    private function addJoinList(ArrayCollection $joinList, $list, array $filterToTableMapping): void
     {
         foreach ($list as $field) {
             if (array_key_exists($field, $filterToTableMapping)) {
@@ -708,12 +685,8 @@ class MySQL extends AbstractAdapter
 
     /**
      * Add the required table infos to the join list, taking care of the dependent tables
-     *
-     * @param ArrayCollection $joinList
-     * @param array $joinMapping
-     * @param array $filterToTableMapping
      */
-    private function addJoinConditions(ArrayCollection $joinList, array $joinMapping, array $filterToTableMapping)
+    private function addJoinConditions(ArrayCollection $joinList, array $joinMapping, array $filterToTableMapping): void
     {
         if (array_key_exists('dependencyField', $joinMapping)) {
             $dependencyJoinMapping = $filterToTableMapping[$joinMapping['dependencyField']];
@@ -731,11 +704,9 @@ class MySQL extends AbstractAdapter
     /**
      * Compute the groupby condition, adding the proper alias that will be added to the final query
      *
-     * @param array $filterToTableMapping
      *
-     * @return array
      */
-    private function computeGroupByFields(array $filterToTableMapping)
+    private function computeGroupByFields(array $filterToTableMapping): array
     {
         $groupFields = [];
         if ($this->getGroupFields()->isEmpty()) {
@@ -763,7 +734,7 @@ class MySQL extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    public function getMinMaxValue($fieldName)
+    public function getMinMaxValue($fieldName): array
     {
         $mysqlAdapter = $this->getFilteredSearchAdapter();
         $mysqlAdapter->copyFilters($this);
@@ -778,7 +749,7 @@ class MySQL extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    public function count()
+    public function count(): int
     {
         $mysqlAdapter = $this->getFilteredSearchAdapter();
         $mysqlAdapter->copyFilters($this);
@@ -810,7 +781,7 @@ class MySQL extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    public function useFiltersAsInitialPopulation()
+    public function useFiltersAsInitialPopulation(): void
     {
         // Initial population has no ORDER BY
         $this->setOrderField('');

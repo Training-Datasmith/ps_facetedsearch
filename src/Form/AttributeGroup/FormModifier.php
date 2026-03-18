@@ -51,7 +51,7 @@ class FormModifier
         $this->translator = $translator;
     }
 
-    public function modify(FormBuilderInterface $formBuilder)
+    public function modify(FormBuilderInterface $formBuilder): void
     {
         // Dynamically check the class and instanciate it, this avoids the module from requiring PrestaShop 1.7.8 minimum,
         // besides this code is not supposed to be called in older versions

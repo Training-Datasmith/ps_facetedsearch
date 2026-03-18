@@ -65,8 +65,6 @@ class HookDispatcher
 
     /**
      * Init hooks
-     *
-     * @param Ps_Facetedsearch $module
      */
     public function __construct(Ps_Facetedsearch $module)
     {
@@ -93,7 +91,6 @@ class HookDispatcher
      * Find hook and dispatch it
      *
      * @param string $hookName
-     * @param array $params
      *
      * @return mixed
      */

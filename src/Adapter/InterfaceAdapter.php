@@ -152,7 +152,6 @@ interface InterfaceAdapter
      * Add a stack of operations with filterName. Operations must contains filterName, values and to the current search
      *
      * @param string $filterName
-     * @param array $operations
      *
      * @return self
      */
@@ -236,8 +235,6 @@ interface InterfaceAdapter
 
     /**
      * Copy all the filters & operationsFilters from adapter to the current search
-     *
-     * @param InterfaceAdapter $adapter
      */
     public function copyFilters(InterfaceAdapter $adapter);
 

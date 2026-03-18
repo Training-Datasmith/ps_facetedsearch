@@ -64,7 +64,6 @@ class Search
     /**
      * Search constructor.
      *
-     * @param Context $context
      * @param string $adapterType
      */
     public function __construct(Context $context, $adapterType = MySQLAdapter::TYPE)
@@ -103,11 +102,9 @@ class Search
     }
 
     /**
-     * @param ProductSearchQuery $query
-     *
      * @return $this
      */
-    public function setQuery(ProductSearchQuery $query)
+    public function setQuery(ProductSearchQuery $query): self
     {
         $this->query = $query;
 
@@ -119,7 +116,7 @@ class Search
      *
      * @param array $selectedFilters
      */
-    public function initSearch($selectedFilters)
+    public function initSearch($selectedFilters): void
     {
         // Adds basic filters that are common for every search, like shop and group limitations
         $this->addCommonFilters();
@@ -140,10 +137,8 @@ class Search
 
     /**
      * Adds filters that the user has specifically selected for current query
-     *
-     * @param array $selectedFilters
      */
-    private function addSearchFilters($selectedFilters)
+    private function addSearchFilters(array $selectedFilters): void
     {
         foreach ($selectedFilters as $key => $filterValues) {
             if (!count($filterValues)) {
@@ -328,7 +323,7 @@ class Search
     /**
      * Adds filters that are common for every search
      */
-    private function addCommonFilters()
+    private function addCommonFilters(): void
     {
         // Setting proper shop
         $this->getSearchAdapter()->addFilter('id_shop', [(int) $this->context->shop->id]);
@@ -348,7 +343,7 @@ class Search
     /**
      * Adds filters that specific for category page
      */
-    private function addControllerSpecificFilters()
+    private function addControllerSpecificFilters(): void
     {
         // Category page
         if ($this->query->getQueryType() == 'category') {
@@ -362,7 +357,7 @@ class Search
             if (empty($idCategory)) {
                 $idCategory = (int) Configuration::get('PS_HOME_CATEGORY');
             }
-            $category = new Category((int) $idCategory);
+            $category = new Category($idCategory);
 
             // If we want to display only products from this category AND not it's subcategories,
             // we add this one specific category ID, otherwise, we will add everything using nleft and nright
@@ -465,9 +460,8 @@ class Search
      * Add a filter with the filterValues extracted from the selectedFilters
      *
      * @param string $filterName
-     * @param array $filterValues
      */
-    public function addFilter($filterName, array $filterValues)
+    public function addFilter($filterName, array $filterValues): void
     {
         $values = [];
         foreach ($filterValues as $filterValue) {
@@ -487,11 +481,8 @@ class Search
 
     /**
      * Add a price filter
-     *
-     * @param float $minPrice
-     * @param float $maxPrice
      */
-    private function addPriceFilter($minPrice, $maxPrice)
+    private function addPriceFilter(float $minPrice, float $maxPrice): void
     {
         $this->getSearchAdapter()->addFilter('price_min', [$maxPrice], '<=');
         $this->getSearchAdapter()->addFilter('price_max', [$minPrice], '>=');

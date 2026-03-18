@@ -56,15 +56,12 @@ class Products
     /**
      * Get the products associated with the current filters.
      *
-     * @param ProductSearchQuery $query
-     * @param array $selectedFilters
      *
-     * @return array
      */
     public function getProductByFilters(
         ProductSearchQuery $query,
         array $selectedFilters = []
-    ) {
+    ): array {
         // Load sorting type and direction, validate it and apply fallback if needed
         $orderBy = $query->getSortOrder()->toLegacyOrderBy(false);
         $orderWay = $query->getSortOrder()->toLegacyOrderWay();
@@ -111,11 +108,8 @@ class Products
 
     /**
      * Post filter product depending on the price and a few extra config variables
-     *
-     * @param array $matchingProductList
-     * @param array $selectedFilters
      */
-    private function pricePostFiltering(&$matchingProductList, $selectedFilters)
+    private function pricePostFiltering(array &$matchingProductList, array $selectedFilters): void
     {
         if (!isset($selectedFilters['price'])) {
             return;
@@ -145,17 +139,15 @@ class Products
     /**
      * Remove products from the product list in case of price postFiltering
      *
-     * @param array $matchingProductList
      * @param bool $psLayeredFilterPriceUsetax
      * @param bool $psLayeredFilterPriceRounding
-     * @param array $priceFilter
      */
     private function filterPrice(
-        &$matchingProductList,
+        array &$matchingProductList,
         $psLayeredFilterPriceUsetax,
         $psLayeredFilterPriceRounding,
-        $priceFilter
-    ) {
+        array $priceFilter
+    ): void {
         /* for this case, price could be out of range, so we need to compute the real price */
         foreach ($matchingProductList as $key => $product) {
             if (($product['price_min'] < (int) $priceFilter['min'] && $product['price_max'] > (int) $priceFilter['min'])

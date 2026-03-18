@@ -28,10 +28,8 @@ class Product extends AbstractHook
 
     /**
      * After save product
-     *
-     * @param array $params
      */
-    public function actionProductSave(array $params)
+    public function actionProductSave(array $params): void
     {
         if (empty($params['id_product'])) {
             return;

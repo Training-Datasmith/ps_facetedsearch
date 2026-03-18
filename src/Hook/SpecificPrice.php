@@ -25,7 +25,7 @@ class SpecificPrice extends AbstractHook
     /**
      * @var array
      */
-    protected $productsBefore = null;
+    protected $productsBefore;
 
     const AVAILABLE_HOOKS = [
         'actionObjectSpecificPriceRuleUpdateBefore',
@@ -34,10 +34,8 @@ class SpecificPrice extends AbstractHook
 
     /**
      * Before saving a specific price rule
-     *
-     * @param array $params
      */
-    public function actionObjectSpecificPriceRuleUpdateBefore(array $params)
+    public function actionObjectSpecificPriceRuleUpdateBefore(array $params): void
     {
         if (empty($params['object']->id)) {
             return;
@@ -50,10 +48,8 @@ class SpecificPrice extends AbstractHook
 
     /**
      * After saving a specific price rule
-     *
-     * @param array $params
      */
-    public function actionAdminSpecificPriceRuleControllerSaveAfter(array $params)
+    public function actionAdminSpecificPriceRuleControllerSaveAfter(array $params): void
     {
         if (empty($params['return']->id) || empty($this->productsBefore)) {
             return;

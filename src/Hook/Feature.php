@@ -66,11 +66,10 @@ class Feature extends AbstractHook
     /**
      * Hook for modifying feature form formBuilder
      *
-     * @param array $params
      *
      * @throws PrestaShopDatabaseException
      */
-    public function actionFeatureFormBuilderModifier(array $params)
+    public function actionFeatureFormBuilderModifier(array $params): void
     {
         $this->isMigratedPage = true;
         $this->formModifier->modify($params['form_builder'], $this->dataProvider->getData($params));
@@ -80,10 +79,8 @@ class Feature extends AbstractHook
      * Hook after create feature.
      *
      * @since PrestaShop 1.7.8.0
-     *
-     * @param array $params
      */
-    public function actionAfterCreateFeatureFormHandler(array $params)
+    public function actionAfterCreateFeatureFormHandler(array $params): void
     {
         $this->save($params['id'], $params['form_data']);
     }
@@ -92,20 +89,16 @@ class Feature extends AbstractHook
      * Hook after update feature.
      *
      * @since PrestaShop 1.7.8.0
-     *
-     * @param array $params
      */
-    public function actionAfterUpdateFeatureFormHandler(array $params)
+    public function actionAfterUpdateFeatureFormHandler(array $params): void
     {
         $this->save($params['id'], $params['form_data']);
     }
 
     /**
      * Hook after delete a feature
-     *
-     * @param array $params
      */
-    public function actionFeatureDelete(array $params)
+    public function actionFeatureDelete(array $params): void
     {
         if (empty($params['id_feature'])) {
             return;
@@ -120,18 +113,14 @@ class Feature extends AbstractHook
 
     /**
      * Hook post process feature
-     *
-     * @param array $params
      */
-    public function displayFeaturePostProcess(array $params)
+    public function displayFeaturePostProcess(array $params): void
     {
         $this->module->checkLinksRewrite($params);
     }
 
     /**
      * Hook feature form
-     *
-     * @param array $params
      */
     public function displayFeatureForm(array $params)
     {
@@ -172,10 +161,8 @@ class Feature extends AbstractHook
 
     /**
      * After save feature
-     *
-     * @param array $params
      */
-    public function actionFeatureSave(array $params)
+    public function actionFeatureSave(array $params): void
     {
         if (empty($params['id_feature']) || Tools::getValue('layered_indexable') === false) {
             return;
@@ -206,11 +193,10 @@ class Feature extends AbstractHook
      * Saves feature form.
      *
      * @param int $featureId
-     * @param array $formData
      *
      * @since PrestaShop 1.7.8.0
      */
-    private function save($featureId, array $formData)
+    private function save($featureId, array $formData): void
     {
         $this->cleanLayeredIndexableTables($featureId);
 
@@ -254,7 +240,7 @@ class Feature extends AbstractHook
      *
      * @param int $featureId
      */
-    private function cleanLayeredIndexableTables($featureId)
+    private function cleanLayeredIndexableTables($featureId): void
     {
         $this->database->execute(
             'DELETE FROM ' . _DB_PREFIX_ . 'layered_indexable_feature

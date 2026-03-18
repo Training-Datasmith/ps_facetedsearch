@@ -46,7 +46,7 @@ class FormModifier
     public function modify(
         FormBuilderInterface $formBuilder,
         array $data
-    ) {
+    ): void {
         /** @var DataCollectorTranslator|TranslatorComponent $translator */
         $translator = $this->context->getTranslator();
         $invalidCharsHint = $translator->trans(

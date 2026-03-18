@@ -46,13 +46,11 @@ class FormDataProvider
     /**
      * Fills form data
      *
-     * @param array $params
      *
-     * @return array
      *
      * @throws PrestaShopDatabaseException
      */
-    public function getData(array $params)
+    public function getData(array $params): array
     {
         $defaultUrl = [];
         $defaultMetaTitle = [];

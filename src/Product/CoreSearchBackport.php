@@ -43,7 +43,6 @@ class CoreSearchBackport
     /**
      * Returns a pool of product IDs to use when filtering products on search controller.
      *
-     * @param ProductSearchQuery $query
      *
      * @return array Pool of product IDs
      */
@@ -52,16 +51,7 @@ class CoreSearchBackport
         // Get search expression from query
         $expression = Tools::replaceAccentedChars(urldecode($query->getSearchString()));
 
-        // No changes in 8.0 to 8.1
-        if (version_compare(_PS_VERSION_, '8.0.0', '>=')) {
-            return $this->get80($expression);
-        } elseif (version_compare(_PS_VERSION_, '1.7.8.0', '>=')) {
-            return $this->get178($expression);
-        } elseif (version_compare(_PS_VERSION_, '1.7.7.0', '>=')) {
-            return $this->get177($expression);
-        } else {
-            return $this->get176($expression);
-        }
+        return $this->get176($expression);
     }
 
     /**
@@ -71,7 +61,7 @@ class CoreSearchBackport
      *
      * @return array Pool of product IDs
      */
-    public function get176($expr)
+    public function get176($expr): array
     {
         $context = Context::getContext();
         $db = Db::getInstance(_PS_USE_SQL_SLAVE_);
@@ -140,7 +130,7 @@ class CoreSearchBackport
      *
      * @return array Pool of product IDs
      */
-    public function get177($expr)
+    public function get177($expr): array
     {
         $context = Context::getContext();
         $db = Db::getInstance(_PS_USE_SQL_SLAVE_);
@@ -230,7 +220,7 @@ class CoreSearchBackport
      *
      * @return array Pool of product IDs
      */
-    public function get178($expr)
+    public function get178($expr): array
     {
         $context = Context::getContext();
         $db = Db::getInstance(_PS_USE_SQL_SLAVE_);
@@ -319,7 +309,7 @@ class CoreSearchBackport
      *
      * @return array Pool of product IDs
      */
-    public function get80($expr)
+    public function get80($expr): array
     {
         $context = Context::getContext();
         $db = Db::getInstance(_PS_USE_SQL_SLAVE_);

@@ -43,10 +43,8 @@ class Attribute extends AbstractHook
      * Hook for modifying attribute form formBuilder
      *
      * @since PrestaShop 9.0.0
-     *
-     * @param array $params
      */
-    public function actionAttributeFormBuilderModifier(array $params)
+    public function actionAttributeFormBuilderModifier(array $params): void
     {
         $formModifier = new FormModifier($this->context->getTranslator());
         $formModifier->modify($params['form_builder']);
@@ -56,10 +54,8 @@ class Attribute extends AbstractHook
      * Hook that provides extra data in the form.
      *
      * @since PrestaShop 9.0.0
-     *
-     * @param array $params
      */
-    public function actionAttributeFormDataProviderData(array $params)
+    public function actionAttributeFormDataProviderData(array $params): void
     {
         $formDataProvider = new FormDataProvider($this->database);
         $attributeData = $formDataProvider->getData($params);
@@ -71,8 +67,6 @@ class Attribute extends AbstractHook
      * Hook after creation form is handled in migrated page.
      *
      * @since PrestaShop 9.0.0
-     *
-     * @param array $params
      */
     public function actionAfterCreateAttributeFormHandler(array $params): void
     {
@@ -83,8 +77,6 @@ class Attribute extends AbstractHook
      * Hook after edition form is handled in migrated page.
      *
      * @since PrestaShop 9.0.0
-     *
-     * @param array $params
      */
     public function actionAfterUpdateAttributeFormHandler(array $params): void
     {
@@ -93,10 +85,8 @@ class Attribute extends AbstractHook
 
     /**
      * After save attribute
-     *
-     * @param array $params
      */
-    public function actionAttributeSave(array $params)
+    public function actionAttributeSave(array $params): void
     {
         if (empty($params['id_attribute'])) {
             return;
@@ -121,10 +111,8 @@ class Attribute extends AbstractHook
 
     /**
      * After delete attribute
-     *
-     * @param array $params
      */
-    public function actionAttributeGroupDelete(array $params)
+    public function actionAttributeGroupDelete(array $params): void
     {
         if (empty($params['id_attribute'])) {
             return;
@@ -139,18 +127,14 @@ class Attribute extends AbstractHook
 
     /**
      * Post process attribute
-     *
-     * @param array $params
      */
-    public function actionAttributePostProcess(array $params)
+    public function actionAttributePostProcess(array $params): void
     {
         $this->module->checkLinksRewrite($params);
     }
 
     /**
      * Attribute form
-     *
-     * @param array $params
      */
     public function displayAttributeForm(array $params)
     {
@@ -178,8 +162,6 @@ class Attribute extends AbstractHook
     /**
      * This is the common save method, the calling methods just need to format the form data appropriately
      * depending on the page being migrated or not.
-     *
-     * @param array $formData
      */
     private function save(array $formData): void
     {

@@ -28,10 +28,8 @@ class Configuration extends AbstractHook
 
     /**
      * After save of product stock preferences form
-     *
-     * @param array $params
      */
-    public function actionProductPreferencesPageStockSave(array $params)
+    public function actionProductPreferencesPageStockSave(array $params): void
     {
         $this->module->invalidateLayeredFilterBlockCache();
     }

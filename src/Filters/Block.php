@@ -99,13 +99,11 @@ class Block
     /**
      * @param int $nbProducts
      * @param array $selectedFilters
-     *
-     * @return array
      */
     public function getFilterBlock(
         $nbProducts,
         $selectedFilters
-    ) {
+    ): array {
         $idLang = (int) $this->context->language->id;
         $idShop = (int) $this->context->shop->id;
 
@@ -191,10 +189,9 @@ class Block
     /**
      * Insert the filter block into the cache table
      *
-     * @param string $filterHash
      * @param array $data
      */
-    public function insertIntoCache($filterHash, $data)
+    public function insertIntoCache(string $filterHash, $data): void
     {
         if (!Configuration::get('PS_LAYERED_CACHE_ENABLED')) {
             return;
@@ -211,13 +208,10 @@ class Block
     }
 
     /**
-     * @param array $filter
-     * @param array $selectedFilters
      * @param int $nbProducts
      *
-     * @return array
      */
-    private function getPriceRangeBlock($filter, $selectedFilters, $nbProducts)
+    private function getPriceRangeBlock(array $filter, array $selectedFilters, $nbProducts): array
     {
         if (!$this->showPriceFilter()) {
             return [];
@@ -238,11 +232,11 @@ class Block
             'nbr' => $nbProducts,
         ];
 
-        list($priceMinFilter, $priceMaxFilter, $weightFilter) = $this->ignorePriceAndWeightFilters(
+        [$priceMinFilter, $priceMaxFilter, $weightFilter] = $this->ignorePriceAndWeightFilters(
             $this->searchAdapter->getInitialPopulation()
         );
 
-        list($priceBlock['min'], $priceBlock['max']) = $this->searchAdapter->getInitialPopulation()->getMinMaxPriceValue();
+        [$priceBlock['min'], $priceBlock['max']] = $this->searchAdapter->getInitialPopulation()->getMinMaxPriceValue();
         $priceBlock['value'] = !empty($selectedFilters['price']) ? $selectedFilters['price'] : null;
 
         $this->restorePriceAndWeightFilters(
@@ -260,11 +254,9 @@ class Block
      * otherwise they will always disappear if we filter on price / weight
      * because only one choice will remain
      *
-     * @param InterfaceAdapter $filteredSearchAdapter
      *
-     * @return array
      */
-    private function ignorePriceAndWeightFilters(InterfaceAdapter $filteredSearchAdapter)
+    private function ignorePriceAndWeightFilters(InterfaceAdapter $filteredSearchAdapter): array
     {
         // disable the current price and weight filters to compute ranges
         $priceMinFilter = $filteredSearchAdapter->getFilter('price_min');
@@ -294,7 +286,7 @@ class Block
         $priceMinFilter,
         $priceMaxFilter,
         $weightFilter
-    ) {
+    ): void {
         // put back the price and weight filters
         $filteredSearchAdapter->setFilter('price_min', $priceMinFilter);
         $filteredSearchAdapter->setFilter('price_max', $priceMaxFilter);
@@ -304,13 +296,10 @@ class Block
     /**
      * Get the weight filter block
      *
-     * @param array $filter
-     * @param array $selectedFilters
      * @param int $nbProducts
      *
-     * @return array
      */
-    private function getWeightRangeBlock($filter, $selectedFilters, $nbProducts)
+    private function getWeightRangeBlock(array $filter, array $selectedFilters, $nbProducts): array
     {
         $weightBlock = [
             'type_lite' => 'weight',
@@ -327,11 +316,11 @@ class Block
             'nbr' => $nbProducts,
         ];
 
-        list($priceMinFilter, $priceMaxFilter, $weightFilter) = $this->ignorePriceAndWeightFilters(
+        [$priceMinFilter, $priceMaxFilter, $weightFilter] = $this->ignorePriceAndWeightFilters(
             $this->searchAdapter->getInitialPopulation()
         );
 
-        list($weightBlock['min'], $weightBlock['max']) = $this->searchAdapter->getInitialPopulation()->getMinMaxValue('p.weight');
+        [$weightBlock['min'], $weightBlock['max']] = $this->searchAdapter->getInitialPopulation()->getMinMaxValue('p.weight');
         if (empty($weightBlock['min']) && empty($weightBlock['max'])) {
             // We don't need to continue, no filter available
             return [];
@@ -352,12 +341,9 @@ class Block
     /**
      * Get the condition filter block
      *
-     * @param array $filter
-     * @param array $selectedFilters
      *
-     * @return array
      */
-    private function getConditionsBlock($filter, $selectedFilters)
+    private function getConditionsBlock(array $filter, array $selectedFilters): array
     {
         $conditionArray = [
             'new' => [
@@ -387,7 +373,7 @@ class Block
         ];
         $filteredSearchAdapter = $this->searchAdapter->getFilteredSearchAdapter('condition');
         $results = $filteredSearchAdapter->valueCount('condition');
-        foreach ($results as $key => $values) {
+        foreach ($results as $values) {
             $condition = $values['condition'];
             $count = $values['c'];
 
@@ -399,7 +385,7 @@ class Block
             }
         }
 
-        $conditionBlock = [
+        return [
             'type_lite' => 'condition',
             'type' => 'condition',
             'id_key' => 0,
@@ -408,19 +394,14 @@ class Block
             'filter_show_limit' => (int) $filter['filter_show_limit'],
             'filter_type' => $filter['filter_type'],
         ];
-
-        return $conditionBlock;
     }
 
     /**
      * Get the quantities filter block
      *
-     * @param array $filter
-     * @param array $selectedFilters
      *
-     * @return array
      */
-    private function getAvailabilitiesBlock($filter, $selectedFilters)
+    private function getAvailabilitiesBlock(array $filter, array $selectedFilters): array
     {
         if ($this->psStockManagement === null) {
             $this->psStockManagement = (bool) Configuration::get('PS_STOCK_MANAGEMENT');
@@ -517,7 +498,7 @@ class Block
             }
         }
 
-        $quantityBlock = [
+        return [
             'type_lite' => 'availability',
             'type' => 'availability',
             'id_key' => 0,
@@ -526,19 +507,14 @@ class Block
             'filter_show_limit' => (int) $filter['filter_show_limit'],
             'filter_type' => $filter['filter_type'],
         ];
-
-        return $quantityBlock;
     }
 
     /**
      * Gets block for extra product properties like "new", "on sale" and "discounted"
      *
-     * @param array $filter
-     * @param array $selectedFilters
      *
-     * @return array
      */
-    private function getHighlightsBlock($filter, $selectedFilters)
+    private function getHighlightsBlock(array $filter, array $selectedFilters): array
     {
         // Prepare array with options
         $extrasOptions = [];
@@ -610,7 +586,7 @@ class Block
             }
         }
 
-        $conditionBlock = [
+        return [
             'type_lite' => 'extras',
             'type' => 'extras',
             'id_key' => 0,
@@ -619,20 +595,14 @@ class Block
             'filter_show_limit' => (int) $filter['filter_show_limit'],
             'filter_type' => $filter['filter_type'],
         ];
-
-        return $conditionBlock;
     }
 
     /**
      * Get the manufacturers filter block
      *
-     * @param array $filter
-     * @param array $selectedFilters
-     * @param int $idLang
      *
-     * @return array
      */
-    private function getManufacturersBlock($filter, $selectedFilters, $idLang)
+    private function getManufacturersBlock(array $filter, array $selectedFilters, int $idLang): array
     {
         $manufacturersArray = $manufacturers = [];
 
@@ -649,12 +619,12 @@ class Block
             return $manufacturersArray;
         }
 
-        foreach ($tempManufacturers as $key => $manufacturer) {
+        foreach ($tempManufacturers as $manufacturer) {
             $manufacturers[$manufacturer['id_manufacturer']] = $manufacturer;
         }
 
         $results = $filteredSearchAdapter->valueCount('id_manufacturer');
-        foreach ($results as $key => $values) {
+        foreach ($results as $values) {
             if (!isset($values['id_manufacturer'])) {
                 continue;
             }
@@ -677,7 +647,7 @@ class Block
             }
         }
 
-        $manufacturerBlock = [
+        return [
             'type_lite' => 'manufacturer',
             'type' => 'manufacturer',
             'id_key' => 0,
@@ -686,20 +656,15 @@ class Block
             'filter_show_limit' => (int) $filter['filter_show_limit'],
             'filter_type' => $filter['filter_type'],
         ];
-
-        return $manufacturerBlock;
     }
 
     /**
      * Get the attributes filter block
      *
-     * @param array $filter
-     * @param array $selectedFilters
-     * @param int $idLang
      *
      * @return array
      */
-    private function getAttributesBlock($filter, $selectedFilters, $idLang)
+    private function getAttributesBlock(array $filter, array $selectedFilters, int $idLang)
     {
         $attributesBlock = [];
         $filteredSearchAdapter = null;
@@ -730,7 +695,7 @@ class Block
             [[['id_attribute_group', [(int) $idAttributeGroup]]]]
         );
         $results = $filteredSearchAdapter->valueCount('id_attribute');
-        foreach ($results as $key => $values) {
+        foreach ($results as $values) {
             $idAttribute = $values['id_attribute'];
             if (!isset($attributes[$idAttribute])) {
                 continue;
@@ -780,20 +745,15 @@ class Block
             $attributesBlock[$idAttributeGroup]['values'] = $this->sortByKey($attributes, $value['values']);
         }
 
-        $attributesBlock = $this->sortByKey($attributesGroup, $attributesBlock);
-
-        return $attributesBlock;
+        return $this->sortByKey($attributesGroup, $attributesBlock);
     }
 
     /**
      * Sort an array using the same key order than the sortedReferenceArray
      *
-     * @param array $sortedReferenceArray
-     * @param array $array
      *
-     * @return array
      */
-    private function sortByKey(array $sortedReferenceArray, $array)
+    private function sortByKey(array $sortedReferenceArray, array $array): array
     {
         $sortedArray = [];
 
@@ -810,13 +770,10 @@ class Block
     /**
      * Get the features filter block
      *
-     * @param array $filter
-     * @param array $selectedFilters
-     * @param int $idLang
      *
      * @return array
      */
-    private function getFeaturesBlock($filter, $selectedFilters, $idLang)
+    private function getFeaturesBlock(array $filter, array $selectedFilters, int $idLang)
     {
         $featureBlock = [];
         $idFeature = $filter['id_value'];
@@ -848,7 +805,7 @@ class Block
 
         $filteredSearchAdapter->addSelectField('id_feature');
         $results = $filteredSearchAdapter->valueCount('id_feature_value');
-        foreach ($results as $key => $values) {
+        foreach ($results as $values) {
             $idFeatureValue = $values['id_feature_value'];
             $idFeature = $values['id_feature'];
             $count = $values['c'];
@@ -892,19 +849,15 @@ class Block
             }
         }
 
-        $featureBlock = $this->sortFeatureBlock($featureBlock);
-
-        return $featureBlock;
+        return $this->sortFeatureBlock($featureBlock);
     }
 
     /**
      * Natural sort multi-dimensional feature array
      *
-     * @param array $featureBlock
      *
-     * @return array
      */
-    private function sortFeatureBlock($featureBlock)
+    private function sortFeatureBlock(array $featureBlock): array
     {
         //Natural sort
         foreach ($featureBlock as $key => $value) {
@@ -929,10 +882,9 @@ class Block
     /**
      * Add the categories filter condition based on the parent and config variables
      *
-     * @param InterfaceAdapter $filteredSearchAdapter
      * @param Category $parent
      */
-    private function addCategoriesBlockFilters(InterfaceAdapter $filteredSearchAdapter, $parent)
+    private function addCategoriesBlockFilters(InterfaceAdapter $filteredSearchAdapter, $parent): void
     {
         if (Group::isFeatureActive()) {
             $userGroups = ($this->context->customer->isLogged() ? $this->context->customer->getGroups() : [
@@ -958,14 +910,10 @@ class Block
     /**
      * Get the categories filter block
      *
-     * @param array $filter
-     * @param array $selectedFilters
-     * @param int $idLang
      * @param Category $parent
      *
-     * @return array
      */
-    private function getCategoriesBlock($filter, $selectedFilters, $idLang, $parent)
+    private function getCategoriesBlock(array $filter, array $selectedFilters, int $idLang, $parent): array
     {
         $filteredSearchAdapter = $this->searchAdapter->getFilteredSearchAdapter('id_category');
         $this->addCategoriesBlockFilters($filteredSearchAdapter, $parent);
@@ -980,13 +928,13 @@ class Block
             '',
             'ORDER BY c.nleft, c.position'
         );
-        foreach ($categories as $key => $value) {
+        foreach ($categories as $value) {
             $categories[$value['id_category']] = $value;
         }
 
         $results = $filteredSearchAdapter->valueCount('id_category');
 
-        foreach ($results as $key => $values) {
+        foreach ($results as $values) {
             $idCategory = $values['id_category'];
             if (!isset($categories[$idCategory])) {
                 // Category can sometimes not be found in case of multistore
@@ -1005,7 +953,7 @@ class Block
             }
         }
 
-        $categoryBlock = [
+        return [
             'type_lite' => 'category',
             'type' => 'category',
             'id_key' => 0,
@@ -1014,16 +962,12 @@ class Block
             'filter_show_limit' => (int) $filter['filter_show_limit'],
             'filter_type' => $filter['filter_type'],
         ];
-
-        return $categoryBlock;
     }
 
     /**
      * Prepare price specifications to display cldr prices.
-     *
-     * @return array
      */
-    private function preparePriceSpecifications()
+    private function preparePriceSpecifications(): array
     {
         /* @var PriceSpecification */
         $priceSpecification = $this->context->currentLocale->getPriceSpecification($this->context->currency->iso_code);

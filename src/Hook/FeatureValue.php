@@ -60,10 +60,8 @@ class FeatureValue extends AbstractHook
      * Hook for modifying feature form formBuilder
      *
      * @since PrestaShop 9.0
-     *
-     * @param array $params
      */
-    public function actionFeatureValueFormBuilderModifier(array $params)
+    public function actionFeatureValueFormBuilderModifier(array $params): void
     {
         $this->formModifier->modify($params['form_builder'], $this->dataProvider->getData($params));
     }
@@ -72,10 +70,8 @@ class FeatureValue extends AbstractHook
      * Hook after create feature.
      *
      * @since PrestaShop 9.0
-     *
-     * @param array $params
      */
-    public function actionAfterCreateFeatureValueFormHandler(array $params)
+    public function actionAfterCreateFeatureValueFormHandler(array $params): void
     {
         $this->save($params['id'], $params['form_data']);
     }
@@ -84,20 +80,16 @@ class FeatureValue extends AbstractHook
      * Hook after update feature.
      *
      * @since PrestaShop 9.0
-     *
-     * @param array $params
      */
-    public function actionAfterUpdateFeatureValueFormHandler(array $params)
+    public function actionAfterUpdateFeatureValueFormHandler(array $params): void
     {
         $this->save($params['id'], $params['form_data']);
     }
 
     /**
      * After save feature value
-     *
-     * @param array $params
      */
-    public function actionFeatureValueSave(array $params)
+    public function actionFeatureValueSave(array $params): void
     {
         if (empty($params['id_feature_value'])) {
             return;
@@ -131,10 +123,8 @@ class FeatureValue extends AbstractHook
 
     /**
      * After delete Feature value
-     *
-     * @param array $params
      */
-    public function actionFeatureValueDelete(array $params)
+    public function actionFeatureValueDelete(array $params): void
     {
         if (empty($params['id_feature_value'])) {
             return;
@@ -149,10 +139,8 @@ class FeatureValue extends AbstractHook
 
     /**
      * Post process feature value
-     *
-     * @param array $params
      */
-    public function displayFeatureValuePostProcess(array $params)
+    public function displayFeatureValuePostProcess(array $params): void
     {
         $this->module->checkLinksRewrite($params);
     }
@@ -160,7 +148,6 @@ class FeatureValue extends AbstractHook
     /**
      * Display feature value form
      *
-     * @param array $params
      *
      * @return string
      */
@@ -187,7 +174,7 @@ class FeatureValue extends AbstractHook
         return $this->module->render('feature_value_form.tpl');
     }
 
-    private function save($featureValueId, array $formData)
+    private function save($featureValueId, array $formData): void
     {
         $featureValueId = (int) $featureValueId;
         $this->database->execute(

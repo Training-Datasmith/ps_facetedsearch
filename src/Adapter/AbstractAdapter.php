@@ -49,7 +49,7 @@ abstract class AbstractAdapter implements InterfaceAdapter
     protected $orderDirection = 'DESC';
 
     /** @var InterfaceAdapter */
-    protected $initialPopulation = null;
+    protected $initialPopulation;
 
     public function __construct()
     {
@@ -127,11 +127,7 @@ abstract class AbstractAdapter implements InterfaceAdapter
      */
     public function getFilter($filterName)
     {
-        if (isset($this->filters[$filterName])) {
-            return $this->filters[$filterName];
-        }
-
-        return null;
+        return $this->filters[$filterName] ?? null;
     }
 
     /**
@@ -185,7 +181,7 @@ abstract class AbstractAdapter implements InterfaceAdapter
     /**
      * {@inheritdoc}
      */
-    public function copyFilters(InterfaceAdapter $adapter)
+    public function copyFilters(InterfaceAdapter $adapter): void
     {
         $this->filters = clone $adapter->getFilters();
         $this->operationsFilters = clone $adapter->getOperationsFilters();

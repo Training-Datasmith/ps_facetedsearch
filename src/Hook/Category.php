@@ -32,10 +32,8 @@ class Category extends AbstractHook
 
     /**
      * Category addition
-     *
-     * @param array $params
      */
-    public function actionCategoryAdd(array $params)
+    public function actionCategoryAdd(array $params): void
     {
         $this->addCategoryToDefaultFilter((int) $params['category']->id);
 
@@ -45,20 +43,16 @@ class Category extends AbstractHook
 
     /**
      * Category deletion
-     *
-     * @param array $params
      */
-    public function actionCategoryDelete(array $params)
+    public function actionCategoryDelete(array $params): void
     {
         $this->removeCategoryFromFilterTemplates((int) $params['category']->id);
     }
 
     /**
      * Clean and rebuild category filters
-     *
-     * @param int $idCategory
      */
-    private function removeCategoryFromFilterTemplates(int $idCategory)
+    private function removeCategoryFromFilterTemplates(int $idCategory): void
     {
         // Get all filter templates
         $filterTemplates = $this->database->executeS(
@@ -71,15 +65,15 @@ class Category extends AbstractHook
         // If yes, remove it and update the template.
         foreach ($filterTemplates as $template) {
             $filters = Tools::unSerialize($template['filters']);
-            if (!in_array((int) $idCategory, $filters['categories'])) {
+            if (!in_array($idCategory, $filters['categories'])) {
                 continue;
             }
-            unset($filters['categories'][array_search((int) $idCategory, $filters['categories'])]);
+            unset($filters['categories'][array_search($idCategory, $filters['categories'])]);
             $rebuildNeeded = true;
             $this->database->execute(
                 'UPDATE `' . _DB_PREFIX_ . 'layered_filter` 
                 SET `filters` = "' . pSQL(serialize($filters)) . '", 
-                n_categories = ' . (int) count($filters['categories']) . ' 
+                n_categories = ' . count($filters['categories']) . ' 
                 WHERE `id_layered_filter` = ' . (int) $template['id_layered_filter']
             );
         }
@@ -99,7 +93,7 @@ class Category extends AbstractHook
      *
      * @param int $idCategory ID of category being created
      */
-    public function addCategoryToDefaultFilter(int $idCategory)
+    public function addCategoryToDefaultFilter(int $idCategory): void
     {
         // Get default template
         $defaultFilterTemplateId = (int) Configuration::get('PS_LAYERED_DEFAULT_CATEGORY_TEMPLATE');
@@ -121,7 +115,7 @@ class Category extends AbstractHook
         $this->database->execute(
             'UPDATE `' . _DB_PREFIX_ . 'layered_filter` 
             SET `filters` = "' . pSQL(serialize($filters)) . '", 
-            n_categories = ' . (int) count($filters['categories']) . ' 
+            n_categories = ' . count($filters['categories']) . ' 
             WHERE `id_layered_filter` = ' . $defaultFilterTemplateId
         );
 

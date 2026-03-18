@@ -85,10 +85,8 @@ class SearchProvider implements FacetsRendererInterface, ProductSearchProviderIn
 
     /**
      * @param ProductSearchQuery $query
-     *
-     * @return array
      */
-    private function getAvailableSortOrders($query)
+    private function getAvailableSortOrders($query): array
     {
         $sortSalesDesc = new SortOrder('product', 'sales', 'desc');
         // If the query is a search, we want to sort by position in descending order = relevance
@@ -148,15 +146,12 @@ class SearchProvider implements FacetsRendererInterface, ProductSearchProviderIn
      * ready to accept runQuery requests. The query object contains all the important information
      * about what we should get.
      *
-     * @param ProductSearchContext $context
-     * @param ProductSearchQuery $query
      *
-     * @return ProductSearchResult
      */
     public function runQuery(
         ProductSearchContext $context,
         ProductSearchQuery $query
-    ) {
+    ): \PrestaShop\PrestaShop\Core\Product\Search\ProductSearchResult {
         $result = new ProductSearchResult();
 
         /**
@@ -242,12 +237,9 @@ class SearchProvider implements FacetsRendererInterface, ProductSearchProviderIn
     /**
      * Generate unique cache hash to store blocks in cache
      *
-     * @param ProductSearchQuery $query
-     * @param array $facetedSearchFilters
      *
-     * @return string
      */
-    private function generateCacheKeyForQuery(ProductSearchQuery $query, array $facetedSearchFilters)
+    private function generateCacheKeyForQuery(ProductSearchQuery $query, array $facetedSearchFilters): string
     {
         $context = $this->module->getContext();
 
@@ -269,7 +261,7 @@ class SearchProvider implements FacetsRendererInterface, ProductSearchProviderIn
             ]
         );
 
-        $filterHash = md5(
+        return md5(
             sprintf(
                 '%d-%d-%d-%s-%d-%s',
                 (int) $context->shop->id,
@@ -280,21 +272,17 @@ class SearchProvider implements FacetsRendererInterface, ProductSearchProviderIn
                 serialize($facetedSearchFilters)
             )
         );
-
-        return $filterHash;
     }
 
     /**
      * Renders an product search result.
      *
-     * @param ProductSearchContext $context
-     * @param ProductSearchResult $result
      *
      * @return string the HTML of the facets
      */
     public function renderFacets(ProductSearchContext $context, ProductSearchResult $result)
     {
-        list($activeFilters, $displayedFacets, $facetsVar) = $this->prepareActiveFiltersForRender($context, $result);
+        [$activeFilters, $displayedFacets, $facetsVar] = $this->prepareActiveFiltersForRender($result);
 
         // No need to render without facets
         if (empty($facetsVar)) {
@@ -326,14 +314,12 @@ class SearchProvider implements FacetsRendererInterface, ProductSearchProviderIn
     /**
      * Renders an product search result of active filters.
      *
-     * @param ProductSearchContext $context
-     * @param ProductSearchResult $result
      *
      * @return string the HTML of the facets
      */
     public function renderActiveFilters(ProductSearchContext $context, ProductSearchResult $result)
     {
-        list($activeFilters) = $this->prepareActiveFiltersForRender($context, $result);
+        [$activeFilters] = $this->prepareActiveFiltersForRender($result);
 
         $this->module->getContext()->smarty->assign(
             [
@@ -355,12 +341,9 @@ class SearchProvider implements FacetsRendererInterface, ProductSearchProviderIn
     /**
      * Prepare active filters for renderer.
      *
-     * @param ProductSearchContext $context
-     * @param ProductSearchResult $result
      *
-     * @return array|null
      */
-    private function prepareActiveFiltersForRender(ProductSearchContext $context, ProductSearchResult $result)
+    private function prepareActiveFiltersForRender(ProductSearchResult $result): ?array
     {
         $facetCollection = $result->getFacetCollection();
 
@@ -376,7 +359,7 @@ class SearchProvider implements FacetsRendererInterface, ProductSearchProviderIn
 
         $displayedFacets = [];
         $activeFilters = [];
-        foreach ($facetsVar as $idx => $facet) {
+        foreach ($facetsVar as $facet) {
             // Remove undisplayed facets
             if (!empty($facet['displayed'])) {
                 $displayedFacets[] = $facet;
@@ -401,7 +384,6 @@ class SearchProvider implements FacetsRendererInterface, ProductSearchProviderIn
      * Converts a Facet to an array with all necessary
      * information for templating.
      *
-     * @param Facet $facet
      *
      * @return array ready for templating
      */
@@ -428,10 +410,8 @@ class SearchProvider implements FacetsRendererInterface, ProductSearchProviderIn
 
     /**
      * Add a label associated with the facets
-     *
-     * @param array $facets
      */
-    private function labelRangeFilters(array $facets)
+    private function labelRangeFilters(array $facets): void
     {
         $context = $this->module->getContext();
 
@@ -474,7 +454,7 @@ class SearchProvider implements FacetsRendererInterface, ProductSearchProviderIn
      * The URL stub is called 'nextEncodedFacets' because it is used
      * to generate the URL of the search once a filter is activated.
      */
-    private function addEncodedFacetsToFilters(array $facets)
+    private function addEncodedFacetsToFilters(array $facets): void
     {
         // first get the currently active facetFilter in an array
         $originalFacetFilters = $this->urlSerializer->getActiveFacetFiltersFromFacets($facets);
@@ -528,11 +508,8 @@ class SearchProvider implements FacetsRendererInterface, ProductSearchProviderIn
      * Remove the facet when there's only 1 result.
      * Keep facet status when it's a slider.
      * Keep facet status if it's a availability or extras facet.
-     *
-     * @param array $facets
-     * @param int $totalProducts
      */
-    private function hideUselessFacets(array $facets, $totalProducts)
+    private function hideUselessFacets(array $facets, int $totalProducts): void
     {
         foreach ($facets as $facet) {
             // If the facet is a slider type, we hide it ONLY if the MIN and MAX value match
@@ -579,7 +556,7 @@ class SearchProvider implements FacetsRendererInterface, ProductSearchProviderIn
      * Params from $extraParams that have a null value are stripped,
      * and other params are added. Params not in $extraParams are unchanged.
      */
-    private function updateQueryString(array $extraParams = [])
+    private function updateQueryString(array $extraParams = []): string
     {
         $uriWithoutParams = explode('?', $_SERVER['REQUEST_URI'])[0];
         $url = Tools::getCurrentUrlProtocolPrefix() . $_SERVER['HTTP_HOST'] . $uriWithoutParams;
@@ -617,7 +594,7 @@ class SearchProvider implements FacetsRendererInterface, ProductSearchProviderIn
      *
      * @return bool if should add attributes to the select
      */
-    private function shouldPassCombinationIds(array $facetedSearchFilters)
+    private function shouldPassCombinationIds(array $facetedSearchFilters): bool
     {
         return !empty($facetedSearchFilters['id_attribute_group']);
     }

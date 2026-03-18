@@ -30,8 +30,6 @@ class Design extends AbstractHook
      * Force this hook to be called here instance of using WidgetInterface
      * because Hook::isHookCallableOn before the instanceof function.
      * Which means is_callable always returns true with a __call usage.
-     *
-     * @param array $params
      */
     public function displayLeftColumn(array $params)
     {
