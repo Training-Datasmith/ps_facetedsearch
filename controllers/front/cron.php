@@ -37,7 +37,7 @@ class Ps_FacetedSearchCronModuleFrontController extends ModuleFrontController
 
     public function postProcess()
     {
-        if (substr(Tools::hash('ps_facetedsearch/index'), 0, 10) != Tools::getValue('token')) {
+        if (Tools::hash('ps_facetedsearch/index') !== Tools::getValue('token')) {
             header('HTTP/1.1 403 Forbidden');
             header('Status: 403 Forbidden');
             $this->ajaxRender('Bad token');
