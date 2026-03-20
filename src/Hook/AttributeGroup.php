@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
@@ -19,15 +19,13 @@ declare(strict_types=1);
  * @copyright Since 2007 PrestaShop SA and Contributors
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License 3.0 (AFL-3.0)
  */
-
-namespace PrestaShop\Module\FacetedSearch\Hook;
+namespace Presta_Shop\Module\Faceted_Search\Hook;
 
 use Language;
-use PrestaShop\Module\FacetedSearch\Form\AttributeGroup\FormDataProvider;
-use PrestaShop\Module\FacetedSearch\Form\AttributeGroup\FormModifier;
+use Presta_Shop\Module\Faceted_Search\Form\Attribute_Group\Form_Data_Provider;
+use Presta_Shop\Module\Faceted_Search\Form\Attribute_Group\Form_Modifier;
 use Tools;
-
-class AttributeGroup extends AbstractHook
+class Attribute_Group extends Abstract_Hook
 {
     public const AVAILABLE_HOOKS = [
         'actionAttributeGroupDelete',
@@ -40,185 +38,141 @@ class AttributeGroup extends AbstractHook
         'actionAfterCreateAttributeGroupFormHandler',
         'actionAfterUpdateAttributeGroupFormHandler',
     ];
-
     /**
      * Hook for modifying attribute group form formBuilder
      *
      * @since PrestaShop 9.0.0
      */
-    public function actionAttributeGroupFormBuilderModifier(array $params): void
+    public function action_attribute_group_form_builder_modifier(array $params): void
     {
-        $formModifier = new FormModifier($this->context->getTranslator());
-        $formModifier->modify($params['form_builder']);
+        $form_modifier = new Form_Modifier($this->context->get_translator());
+        $form_modifier->modify($params['form_builder']);
     }
-
     /**
      * Hook that provides extra data in the form.
      *
      * @since PrestaShop 9.0.0
      */
-    public function actionAttributeGroupFormDataProviderData(array $params): void
+    public function action_attribute_group_form_data_provider_data(array $params): void
     {
-        $formDataProvider = new FormDataProvider($this->database);
-        $attributeGroupData = $formDataProvider->getData($params);
+        $form_data_provider = new Form_Data_Provider($this->database);
+        $attribute_group_data = $form_data_provider->get_data($params);
         // Update data field in params which is passed by reference
-        $params['data'] = array_merge($params['data'], $attributeGroupData);
+        $params['data'] = array_merge($params['data'], $attribute_group_data);
     }
-
     /**
      * Hook after creation form is handled in migrated page.
      *
      * @since PrestaShop 9.0.0
      */
-    public function actionAfterCreateAttributeGroupFormHandler(array $params): void
+    public function action_after_create_attribute_group_form_handler(array $params): void
     {
         $this->save(array_merge(['id_attribute_group' => $params['id']], $params['form_data']));
     }
-
     /**
      * Hook after edition form is handled in migrated page.
      *
      * @since PrestaShop 9.0.0
      */
-    public function actionAfterUpdateAttributeGroupFormHandler(array $params): void
+    public function action_after_update_attribute_group_form_handler(array $params): void
     {
         $this->save(array_merge(['id_attribute_group' => $params['id']], $params['form_data']));
     }
-
     /**
      * After save Attributes group
      */
-    public function actionAttributeGroupSave(array $params): void
+    public function action_attribute_group_save(array $params): void
     {
-        if (empty($params['id_attribute_group']) || Tools::getValue('layered_indexable') === false) {
+        if (empty($params['id_attribute_group']) || Tools::get_value('layered_indexable') === false) {
             return;
         }
-
-        $formData = [
-            'id_attribute_group' => (int) $params['id_attribute_group'],
-            'is_indexable' => (int) Tools::getValue('layered_indexable'),
-        ];
-
-        foreach (Language::getLanguages(false) as $language) {
-            $langId = (int) $language['id_lang'];
-            $seoUrl = Tools::getValue('url_name_' . $langId);
-            if (!empty($seoUrl)) {
-                $formData['url_name'][$langId] = $seoUrl;
+        $form_data = ['id_attribute_group' => (int) $params['id_attribute_group'], 'is_indexable' => (int) Tools::get_value('layered_indexable')];
+        foreach (Language::get_languages(false) as $language) {
+            $lang_id = (int) $language['id_lang'];
+            $seo_url = Tools::get_value('url_name_' . $lang_id);
+            if (!empty($seo_url)) {
+                $form_data['url_name'][$lang_id] = $seo_url;
             }
-            $metaTitle = Tools::getValue('meta_title_' . $langId);
-            if (!empty($metaTitle)) {
-                $formData['meta_title'][$langId] = $metaTitle;
+            $meta_title = Tools::get_value('meta_title_' . $lang_id);
+            if (!empty($meta_title)) {
+                $form_data['meta_title'][$lang_id] = $meta_title;
             }
         }
-        $this->save($formData);
+        $this->save($form_data);
     }
-
     /**
      * After delete attribute group
      */
-    public function actionAttributeGroupDelete(array $params): void
+    public function action_attribute_group_delete(array $params): void
     {
         if (empty($params['id_attribute_group'])) {
             return;
         }
-
-        $this->database->execute(
-            'DELETE FROM ' . _DB_PREFIX_ . 'layered_indexable_attribute_group
-            WHERE `id_attribute_group` = ' . (int) $params['id_attribute_group']
-        );
-        $this->database->execute(
-            'DELETE FROM ' . _DB_PREFIX_ . 'layered_indexable_attribute_group_lang_value
-            WHERE `id_attribute_group` = ' . (int) $params['id_attribute_group']
-        );
-        $this->module->invalidateLayeredFilterBlockCache();
+        $this->database->execute('DELETE FROM ' . _DB_PREFIX_ . 'layered_indexable_attribute_group
+            WHERE `id_attribute_group` = ' . (int) $params['id_attribute_group']);
+        $this->database->execute('DELETE FROM ' . _DB_PREFIX_ . 'layered_indexable_attribute_group_lang_value
+            WHERE `id_attribute_group` = ' . (int) $params['id_attribute_group']);
+        $this->module->invalidate_layered_filter_block_cache();
     }
-
     /**
      * Post process attribute group
      */
-    public function displayAttributeGroupPostProcess(array $params): void
+    public function display_attribute_group_post_process(array $params): void
     {
-        $this->module->checkLinksRewrite($params);
+        $this->module->check_links_rewrite($params);
     }
-
     /**
      * Attribute group form
      *
      *
      * @return string
      */
-    public function displayAttributeGroupForm(array $params)
+    public function display_attribute_group_form(array $params)
     {
         $values = [];
-        $isIndexable = $this->database->getValue(
-            'SELECT `indexable`
+        $is_indexable = $this->database->get_value('SELECT `indexable`
             FROM ' . _DB_PREFIX_ . 'layered_indexable_attribute_group
-            WHERE `id_attribute_group` = ' . (int) $params['id_attribute_group']
-        );
-
-        if ($result = $this->database->executeS(
-            'SELECT `url_name`, `meta_title`, `id_lang` FROM ' . _DB_PREFIX_ . 'layered_indexable_attribute_group_lang_value
-            WHERE `id_attribute_group` = ' . (int) $params['id_attribute_group']
-        )) {
+            WHERE `id_attribute_group` = ' . (int) $params['id_attribute_group']);
+        if ($result = $this->database->execute_s('SELECT `url_name`, `meta_title`, `id_lang` FROM ' . _DB_PREFIX_ . 'layered_indexable_attribute_group_lang_value
+            WHERE `id_attribute_group` = ' . (int) $params['id_attribute_group'])) {
             foreach ($result as $data) {
                 $values[$data['id_lang']] = ['url_name' => $data['url_name'], 'meta_title' => $data['meta_title']];
             }
         }
-
-        $this->context->smarty->assign([
-            'languages' => Language::getLanguages(false),
-            'default_form_language' => (int) $this->context->controller->default_form_language,
-            'values' => $values,
-            'is_indexable' => (bool) $isIndexable,
-        ]);
-
+        $this->context->smarty->assign(['languages' => Language::get_languages(false), 'default_form_language' => (int) $this->context->controller->default_form_language, 'values' => $values, 'is_indexable' => (bool) $is_indexable]);
         return $this->module->render('attribute_group_form.tpl');
     }
-
     /**
      * This is the common save method, the calling methods just need to format the form data appropriately
      * depending on the page being migrated or not.
      */
-    private function save(array $formData): void
+    private function save(array $form_data): void
     {
-        if (empty($formData['id_attribute_group'])) {
+        if (empty($form_data['id_attribute_group'])) {
             return;
         }
-
-        $attributeGroupId = $formData['id_attribute_group'];
-
+        $attribute_group_id = $form_data['id_attribute_group'];
         // First clean all existing data
-        $this->database->execute(
-            'DELETE FROM ' . _DB_PREFIX_ . 'layered_indexable_attribute_group
-            WHERE `id_attribute_group` = ' . $attributeGroupId
-        );
-        $this->database->execute(
-            'DELETE FROM ' . _DB_PREFIX_ . 'layered_indexable_attribute_group_lang_value
-            WHERE `id_attribute_group` = ' . $attributeGroupId
-        );
-
-        $this->database->execute(
-            'INSERT INTO ' . _DB_PREFIX_ . 'layered_indexable_attribute_group (`id_attribute_group`, `indexable`)
-VALUES (' . $attributeGroupId . ', ' . (int) $formData['is_indexable'] . ')'
-        );
-
-        $landIds = array_unique(array_merge(array_keys($formData['meta_title'] ?? []), array_keys($formData['url_name'] ?? [])));
-        foreach ($landIds as $langId) {
-            $seoUrl = $formData['url_name'][$langId] ?? null;
-            $metaTitle = $formData['meta_title'][$langId] ?? null;
-            if (empty($seoUrl) && empty($metaTitle)) {
+        $this->database->execute('DELETE FROM ' . _DB_PREFIX_ . 'layered_indexable_attribute_group
+            WHERE `id_attribute_group` = ' . $attribute_group_id);
+        $this->database->execute('DELETE FROM ' . _DB_PREFIX_ . 'layered_indexable_attribute_group_lang_value
+            WHERE `id_attribute_group` = ' . $attribute_group_id);
+        $this->database->execute('INSERT INTO ' . _DB_PREFIX_ . 'layered_indexable_attribute_group (`id_attribute_group`, `indexable`)
+VALUES (' . $attribute_group_id . ', ' . (int) $form_data['is_indexable'] . ')');
+        $land_ids = array_unique(array_merge(array_keys($form_data['meta_title'] ?? []), array_keys($form_data['url_name'] ?? [])));
+        foreach ($land_ids as $lang_id) {
+            $seo_url = $form_data['url_name'][$lang_id] ?? null;
+            $meta_title = $form_data['meta_title'][$lang_id] ?? null;
+            if (empty($seo_url) && empty($meta_title)) {
                 continue;
             }
-
-            $this->database->execute(
-                'INSERT INTO ' . _DB_PREFIX_ . 'layered_indexable_attribute_group_lang_value
+            $this->database->execute('INSERT INTO ' . _DB_PREFIX_ . 'layered_indexable_attribute_group_lang_value
                 (`id_attribute_group`, `id_lang`, `url_name`, `meta_title`)
                 VALUES (
-                ' . $attributeGroupId . ', ' . $langId . ',
-                \'' . pSQL(Tools::str2url($seoUrl)) . '\',
-                \'' . pSQL($metaTitle, true) . '\')'
-            );
+                ' . $attribute_group_id . ', ' . $lang_id . ',
+                \'' . p_sql(Tools::str2url($seo_url)) . '\',
+                \'' . p_sql($meta_title, true) . '\')');
         }
-        $this->module->invalidateLayeredFilterBlockCache();
+        $this->module->invalidate_layered_filter_block_cache();
     }
 }

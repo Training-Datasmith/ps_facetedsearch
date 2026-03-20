@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
@@ -19,48 +19,38 @@ declare(strict_types=1);
  * @copyright Since 2007 PrestaShop SA and Contributors
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License 3.0 (AFL-3.0)
  */
+namespace Presta_Shop\Module\Faceted_Search\Constraint;
 
-namespace PrestaShop\Module\FacetedSearch\Constraint;
-
-use PrestaShop\PrestaShop\Adapter\Tools;
+use Presta_Shop\Presta_Shop\Adapter\Tools;
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Exception\UnexpectedTypeException;
-
+use Symfony\Component\Validator\Constraint_Validator;
+use Symfony\Component\Validator\Exception\Unexpected_Type_Exception;
 /**
  * Class UrlSegmentValidator responsible for validating an URL segment.
  */
-class UrlSegmentValidator extends ConstraintValidator
+class Url_Segment_Validator extends Constraint_Validator
 {
     /**
      * @var Tools
      */
     private $tools;
-
     public function __construct(Tools $tools)
     {
         $this->tools = $tools;
     }
-
     /**
      * {@inheritdoc}
      */
     public function validate($value, Constraint $constraint): void
     {
-        if (!$constraint instanceof UrlSegment) {
-            throw new UnexpectedTypeException($constraint, UrlSegment::class);
+        if (!$constraint instanceof Url_Segment) {
+            throw new Unexpected_Type_Exception($constraint, Url_Segment::class);
         }
-
         if (null === $value || '' === $value) {
             return;
         }
-
-        if (strtolower($value) !== $this->tools->linkRewrite($value)) {
-            $this->context->buildViolation($constraint->message)
-                ->setTranslationDomain('Admin.Notifications.Error')
-                ->setParameter('%s', $this->formatValue($value))
-                ->addViolation()
-            ;
+        if (strtolower($value) !== $this->tools->link_rewrite($value)) {
+            $this->context->build_violation($constraint->message)->set_translation_domain('Admin.Notifications.Error')->set_parameter('%s', $this->format_value($value))->add_violation();
         }
     }
 }

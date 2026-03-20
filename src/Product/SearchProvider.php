@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
@@ -19,130 +19,82 @@ declare(strict_types=1);
  * @copyright Since 2007 PrestaShop SA and Contributors
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License 3.0 (AFL-3.0)
  */
-
-namespace PrestaShop\Module\FacetedSearch\Product;
+namespace Presta_Shop\Module\Faceted_Search\Product;
 
 use Configuration;
 use Hook;
-use PrestaShop\Module\FacetedSearch\Filters;
-use PrestaShop\Module\FacetedSearch\URLSerializer;
-use PrestaShop\PrestaShop\Core\Product\Search\Facet;
-use PrestaShop\PrestaShop\Core\Product\Search\FacetCollection;
-use PrestaShop\PrestaShop\Core\Product\Search\FacetsRendererInterface;
-use PrestaShop\PrestaShop\Core\Product\Search\ProductSearchContext;
-use PrestaShop\PrestaShop\Core\Product\Search\ProductSearchProviderInterface;
-use PrestaShop\PrestaShop\Core\Product\Search\ProductSearchQuery;
-use PrestaShop\PrestaShop\Core\Product\Search\ProductSearchResult;
-use PrestaShop\PrestaShop\Core\Product\Search\SortOrder;
+use Presta_Shop\Module\Faceted_Search\Filters;
+use Presta_Shop\Module\Faceted_Search\Url_Serializer;
+use Presta_Shop\Presta_Shop\Core\Product\Search\Facet;
+use Presta_Shop\Presta_Shop\Core\Product\Search\Facet_Collection;
+use Presta_Shop\Presta_Shop\Core\Product\Search\Facets_Renderer_Interface;
+use Presta_Shop\Presta_Shop\Core\Product\Search\Product_Search_Context;
+use Presta_Shop\Presta_Shop\Core\Product\Search\Product_Search_Provider_Interface;
+use Presta_Shop\Presta_Shop\Core\Product\Search\Product_Search_Query;
+use Presta_Shop\Presta_Shop\Core\Product\Search\Product_Search_Result;
+use Presta_Shop\Presta_Shop\Core\Product\Search\Sort_Order;
 use Ps_Facetedsearch;
 use Tools;
-
-class SearchProvider implements FacetsRendererInterface, ProductSearchProviderInterface
+class Search_Provider implements Facets_Renderer_Interface, Product_Search_Provider_Interface
 {
     /**
      * @var Ps_Facetedsearch
      */
     private $module;
-
     /**
      * @var Filters\Converter
      */
-    private $filtersConverter;
-
+    private $filters_converter;
     /**
      * @var Filters\DataAccessor
      */
-    private $dataAccessor;
-
+    private $data_accessor;
     /**
      * @var URLSerializer
      */
-    private $urlSerializer;
-
+    private $url_serializer;
     /**
      * @var SearchFactory
      */
-    private $searchFactory;
-
+    private $search_factory;
     /**
      * @var Filters\Provider
      */
     private $provider;
-
-    public function __construct(
-        Ps_Facetedsearch $module,
-        Filters\Converter $converter,
-        URLSerializer $serializer,
-        Filters\DataAccessor $dataAccessor,
-        SearchFactory $searchFactory,
-        Filters\Provider $provider
-    ) {
+    public function __construct(Ps_Facetedsearch $module, Filters\Converter $converter, Url_Serializer $serializer, Filters\Data_Accessor $data_accessor, Search_Factory $search_factory, Filters\Provider $provider)
+    {
         $this->module = $module;
-        $this->filtersConverter = $converter;
-        $this->urlSerializer = $serializer;
-        $this->dataAccessor = $dataAccessor;
-        $this->searchFactory = $searchFactory;
+        $this->filters_converter = $converter;
+        $this->url_serializer = $serializer;
+        $this->data_accessor = $data_accessor;
+        $this->search_factory = $search_factory;
         $this->provider = $provider;
     }
-
     /**
      * @param ProductSearchQuery $query
      */
-    private function getAvailableSortOrders($query): array
+    private function get_available_sort_orders($query): array
     {
-        $sortSalesDesc = new SortOrder('product', 'sales', 'desc');
+        $sort_sales_desc = new Sort_Order('product', 'sales', 'desc');
         // If the query is a search, we want to sort by position in descending order = relevance
         // If the query is a category, manufacturer or supplier, we want to sort by position in ascending order
-        $sortPosAsc = new SortOrder('product', 'position', ($query->getQueryType() == 'search' ? 'desc' : 'asc'));
-        $sortNameAsc = new SortOrder('product', 'name', 'asc');
-        $sortNameDesc = new SortOrder('product', 'name', 'desc');
-        $sortPriceAsc = new SortOrder('product', 'price', 'asc');
-        $sortPriceDesc = new SortOrder('product', 'price', 'desc');
-        $sortDateAsc = new SortOrder('product', 'date_add', 'asc');
-        $sortDateDesc = new SortOrder('product', 'date_add', 'desc');
-        $sortRefAsc = new SortOrder('product', 'reference', 'asc');
-        $sortRefDesc = new SortOrder('product', 'reference', 'desc');
-        $translator = $this->module->getTranslator();
-
-        $sortOrders = [
-            $sortSalesDesc->setLabel(
-                $translator->trans('Sales, highest to lowest', [], 'Shop.Theme.Catalog')
-            ),
-            $sortPosAsc->setLabel(
-                $translator->trans('Relevance', [], 'Shop.Theme.Catalog')
-            ),
-            $sortNameAsc->setLabel(
-                $translator->trans('Name, A to Z', [], 'Shop.Theme.Catalog')
-            ),
-            $sortNameDesc->setLabel(
-                $translator->trans('Name, Z to A', [], 'Shop.Theme.Catalog')
-            ),
-            $sortPriceAsc->setLabel(
-                $translator->trans('Price, low to high', [], 'Shop.Theme.Catalog')
-            ),
-            $sortPriceDesc->setLabel(
-                $translator->trans('Price, high to low', [], 'Shop.Theme.Catalog')
-            ),
-            $sortRefAsc->setLabel(
-                $translator->trans('Reference, A to Z', [], 'Shop.Theme.Catalog')
-            ),
-            $sortRefDesc->setLabel(
-                $translator->trans('Reference, Z to A', [], 'Shop.Theme.Catalog')
-            ),
-        ];
-
-        if ($query->getQueryType() == 'new-products') {
-            $sortOrders[] = $sortDateAsc->setLabel(
-                $translator->trans('Date added, oldest to newest', [], 'Shop.Theme.Catalog')
-            );
-            $sortOrders[] = $sortDateDesc->setLabel(
-                $translator->trans('Date added, newest to oldest', [], 'Shop.Theme.Catalog')
-            );
+        $sort_pos_asc = new Sort_Order('product', 'position', $query->get_query_type() == 'search' ? 'desc' : 'asc');
+        $sort_name_asc = new Sort_Order('product', 'name', 'asc');
+        $sort_name_desc = new Sort_Order('product', 'name', 'desc');
+        $sort_price_asc = new Sort_Order('product', 'price', 'asc');
+        $sort_price_desc = new Sort_Order('product', 'price', 'desc');
+        $sort_date_asc = new Sort_Order('product', 'date_add', 'asc');
+        $sort_date_desc = new Sort_Order('product', 'date_add', 'desc');
+        $sort_ref_asc = new Sort_Order('product', 'reference', 'asc');
+        $sort_ref_desc = new Sort_Order('product', 'reference', 'desc');
+        $translator = $this->module->get_translator();
+        $sort_orders = [$sort_sales_desc->set_label($translator->trans('Sales, highest to lowest', [], 'Shop.Theme.Catalog')), $sort_pos_asc->set_label($translator->trans('Relevance', [], 'Shop.Theme.Catalog')), $sort_name_asc->set_label($translator->trans('Name, A to Z', [], 'Shop.Theme.Catalog')), $sort_name_desc->set_label($translator->trans('Name, Z to A', [], 'Shop.Theme.Catalog')), $sort_price_asc->set_label($translator->trans('Price, low to high', [], 'Shop.Theme.Catalog')), $sort_price_desc->set_label($translator->trans('Price, high to low', [], 'Shop.Theme.Catalog')), $sort_ref_asc->set_label($translator->trans('Reference, A to Z', [], 'Shop.Theme.Catalog')), $sort_ref_desc->set_label($translator->trans('Reference, Z to A', [], 'Shop.Theme.Catalog'))];
+        if ($query->get_query_type() == 'new-products') {
+            $sort_orders[] = $sort_date_asc->set_label($translator->trans('Date added, oldest to newest', [], 'Shop.Theme.Catalog'));
+            $sort_orders[] = $sort_date_desc->set_label($translator->trans('Date added, newest to oldest', [], 'Shop.Theme.Catalog'));
         }
-
-        return $sortOrders;
+        return $sort_orders;
     }
-
     /**
      * Instance of this class was previously passed to frontend controller, so we are now
      * ready to accept runQuery requests. The query object contains all the important information
@@ -150,238 +102,134 @@ class SearchProvider implements FacetsRendererInterface, ProductSearchProviderIn
      *
      *
      */
-    public function runQuery(
-        ProductSearchContext $context,
-        ProductSearchQuery $query
-    ): \PrestaShop\PrestaShop\Core\Product\Search\ProductSearchResult {
-        $result = new ProductSearchResult();
-
+    public function run_query(Product_Search_Context $context, Product_Search_Query $query): \Presta_Shop\Presta_Shop\Core\Product\Search\Product_Search_Result
+    {
+        $result = new Product_Search_Result();
         /**
          * Get currently selected filters. In the query, it's passed as encoded URL string,
          * we make it an array. All filters in the URL that are no longer valid are removed.
          */
-        $facetedSearchFilters = $this->filtersConverter->createFacetedSearchFiltersFromQuery($query);
-
+        $faceted_search_filters = $this->filters_converter->create_faceted_search_filters_from_query($query);
         // Initialize the search mechanism
-        $context = $this->module->getContext();
-        $facetedSearch = $this->searchFactory->build($context);
-
+        $context = $this->module->get_context();
+        $faceted_search = $this->search_factory->build($context);
         // Add query information into Search
-        $facetedSearch->setQuery($query);
-
+        $faceted_search->set_query($query);
         // Init the search with the initial population associated with the current filters
-        $facetedSearch->initSearch($facetedSearchFilters);
-
+        $faceted_search->init_search($faceted_search_filters);
         // Request combination IDs if we have some attributes to search by.
         // If not, we won't use this to let the core select the default combination.
-        if ($this->shouldPassCombinationIds($facetedSearchFilters)) {
-            $facetedSearch->getSearchAdapter()->getInitialPopulation()->addSelectField('id_product_attribute');
-            $facetedSearch->getSearchAdapter()->addSelectField('id_product_attribute');
+        if ($this->should_pass_combination_ids($faceted_search_filters)) {
+            $faceted_search->get_search_adapter()->get_initial_population()->add_select_field('id_product_attribute');
+            $faceted_search->get_search_adapter()->add_select_field('id_product_attribute');
         }
-
         // Load the product searcher, it gets the Adapter through Search object
-        $filterProductSearch = new Filters\Products($facetedSearch);
-
+        $filter_product_search = new Filters\Products($faceted_search);
         // Get the product associated with the current filter
-        $productsAndCount = $filterProductSearch->getProductByFilters(
-            $query,
-            $facetedSearchFilters
-        );
-
-        $result
-            ->setProducts($productsAndCount['products'])
-            ->setTotalProductsCount($productsAndCount['count'])
-            ->setAvailableSortOrders($this->getAvailableSortOrders($query));
-
+        $products_and_count = $filter_product_search->get_product_by_filters($query, $faceted_search_filters);
+        $result->set_products($products_and_count['products'])->set_total_products_count($products_and_count['count'])->set_available_sort_orders($this->get_available_sort_orders($query));
         // Now let's get the filter blocks associated with the current search.
         // This will allow user to further filter this list we found.
-        $filterBlockSearch = new Filters\Block(
-            $facetedSearch->getSearchAdapter(),
-            $context,
-            $this->module->getDatabase(),
-            $this->dataAccessor,
-            $query,
-            $this->provider
-        );
-
+        $filter_block_search = new Filters\Block($faceted_search->get_search_adapter(), $context, $this->module->get_database(), $this->data_accessor, $query, $this->provider);
         // Let's try to get filters from cache, if the controller is supported
-        $filterHash = $this->generateCacheKeyForQuery($query, $facetedSearchFilters);
-        if ($this->module->shouldCacheController($query->getQueryType())) {
-            $filterBlock = $filterBlockSearch->getFromCache($filterHash);
+        $filter_hash = $this->generate_cache_key_for_query($query, $faceted_search_filters);
+        if ($this->module->should_cache_controller($query->get_query_type())) {
+            $filter_block = $filter_block_search->get_from_cache($filter_hash);
         }
-
         // If not, we regenerate it and cache it
-        if (empty($filterBlock)) {
-            $filterBlock = $filterBlockSearch->getFilterBlock($productsAndCount['count'], $facetedSearchFilters);
-            if ($this->module->shouldCacheController($query->getQueryType())) {
-                $filterBlockSearch->insertIntoCache($filterHash, $filterBlock);
+        if (empty($filter_block)) {
+            $filter_block = $filter_block_search->get_filter_block($products_and_count['count'], $faceted_search_filters);
+            if ($this->module->should_cache_controller($query->get_query_type())) {
+                $filter_block_search->insert_into_cache($filter_hash, $filter_block);
             }
         }
-
-        $facets = $this->filtersConverter->getFacetsFromFilterBlocks(
-            $filterBlock['filters']
-        );
-
-        $this->labelRangeFilters($facets);
-        $this->addEncodedFacetsToFilters($facets);
-        $this->hideUselessFacets($facets, (int) $result->getTotalProductsCount());
-
-        $facetCollection = new FacetCollection();
-        $nextMenu = $facetCollection->setFacets($facets);
-        $result->setFacetCollection($nextMenu);
-
-        $facetFilters = $this->urlSerializer->getActiveFacetFiltersFromFacets($facets);
-        $result->setEncodedFacets($this->urlSerializer->serialize($facetFilters));
-
+        $facets = $this->filters_converter->get_facets_from_filter_blocks($filter_block['filters']);
+        $this->label_range_filters($facets);
+        $this->add_encoded_facets_to_filters($facets);
+        $this->hide_useless_facets($facets, (int) $result->get_total_products_count());
+        $facet_collection = new Facet_Collection();
+        $next_menu = $facet_collection->set_facets($facets);
+        $result->set_facet_collection($next_menu);
+        $facet_filters = $this->url_serializer->get_active_facet_filters_from_facets($facets);
+        $result->set_encoded_facets($this->url_serializer->serialize($facet_filters));
         return $result;
     }
-
     /**
      * Generate unique cache hash to store blocks in cache
      *
      *
      */
-    private function generateCacheKeyForQuery(ProductSearchQuery $query, array $facetedSearchFilters): string
+    private function generate_cache_key_for_query(Product_Search_Query $query, array $faceted_search_filters): string
     {
-        $context = $this->module->getContext();
-
-        $filterKey = $query->getQueryType();
-        if ($query->getQueryType() == 'category') {
-            $filterKey .= $query->getIdCategory();
-        } elseif ($query->getQueryType() == 'manufacturer') {
-            $filterKey .= $query->getIdManufacturer();
-        } elseif ($query->getQueryType() == 'supplier') {
-            $filterKey .= $query->getIdSupplier();
+        $context = $this->module->get_context();
+        $filter_key = $query->get_query_type();
+        if ($query->get_query_type() == 'category') {
+            $filter_key .= $query->get_id_category();
+        } elseif ($query->get_query_type() == 'manufacturer') {
+            $filter_key .= $query->get_id_manufacturer();
+        } elseif ($query->get_query_type() == 'supplier') {
+            $filter_key .= $query->get_id_supplier();
         }
-
-        Hook::exec(
-            'actionFacetedSearchCacheKeyGeneration',
-            [
-                'filterKey' => &$filterKey,
-                'query' => $query,
-                'facetedSearchFilters' => &$facetedSearchFilters,
-            ]
-        );
-
-        return md5(
-            sprintf(
-                '%d-%d-%d-%s-%d-%s',
-                (int) $context->shop->id,
-                (int) $context->currency->id,
-                (int) $context->language->id,
-                $filterKey,
-                (int) $context->country->id,
-                serialize($facetedSearchFilters)
-            )
-        );
+        Hook::exec('actionFacetedSearchCacheKeyGeneration', ['filterKey' => &$filter_key, 'query' => $query, 'facetedSearchFilters' => &$faceted_search_filters]);
+        return md5(sprintf('%d-%d-%d-%s-%d-%s', (int) $context->shop->id, (int) $context->currency->id, (int) $context->language->id, $filter_key, (int) $context->country->id, serialize($faceted_search_filters)));
     }
-
     /**
      * Renders an product search result.
      *
      *
      * @return string the HTML of the facets
      */
-    public function renderFacets(ProductSearchContext $context, ProductSearchResult $result)
+    public function render_facets(Product_Search_Context $context, Product_Search_Result $result)
     {
-        [$activeFilters, $displayedFacets, $facetsVar] = $this->prepareActiveFiltersForRender($result);
-
+        [$active_filters, $displayed_facets, $facets_var] = $this->prepare_active_filters_for_render($result);
         // No need to render without facets
-        if (empty($facetsVar)) {
+        if (empty($facets_var)) {
             return '';
         }
-
-        $this->module->getContext()->smarty->assign(
-            [
-                'show_quantities' => Configuration::get('PS_LAYERED_SHOW_QTIES'),
-                'facets' => $facetsVar,
-                'js_enabled' => $this->module->isAjax(),
-                'displayedFacets' => $displayedFacets,
-                'activeFilters' => $activeFilters,
-                'sort_order' => $result->getCurrentSortOrder()->toString(),
-                'clear_all_link' => $this->updateQueryString(
-                    [
-                        'q' => null,
-                        'page' => null,
-                    ]
-                ),
-            ]
-        );
-
-        return $this->module->fetch(
-            'module:ps_facetedsearch/views/templates/front/catalog/facets.tpl'
-        );
+        $this->module->get_context()->smarty->assign(['show_quantities' => Configuration::get('PS_LAYERED_SHOW_QTIES'), 'facets' => $facets_var, 'js_enabled' => $this->module->is_ajax(), 'displayedFacets' => $displayed_facets, 'activeFilters' => $active_filters, 'sort_order' => $result->get_current_sort_order()->to_string(), 'clear_all_link' => $this->update_query_string(['q' => null, 'page' => null])]);
+        return $this->module->fetch('module:ps_facetedsearch/views/templates/front/catalog/facets.tpl');
     }
-
     /**
      * Renders an product search result of active filters.
      *
      *
      * @return string the HTML of the facets
      */
-    public function renderActiveFilters(ProductSearchContext $context, ProductSearchResult $result)
+    public function render_active_filters(Product_Search_Context $context, Product_Search_Result $result)
     {
-        [$activeFilters] = $this->prepareActiveFiltersForRender($result);
-
-        $this->module->getContext()->smarty->assign(
-            [
-                'activeFilters' => $activeFilters,
-                'clear_all_link' => $this->updateQueryString(
-                    [
-                        'q' => null,
-                        'page' => null,
-                    ]
-                ),
-            ]
-        );
-
-        return $this->module->fetch(
-            'module:ps_facetedsearch/views/templates/front/catalog/active-filters.tpl'
-        );
+        [$active_filters] = $this->prepare_active_filters_for_render($result);
+        $this->module->get_context()->smarty->assign(['activeFilters' => $active_filters, 'clear_all_link' => $this->update_query_string(['q' => null, 'page' => null])]);
+        return $this->module->fetch('module:ps_facetedsearch/views/templates/front/catalog/active-filters.tpl');
     }
-
     /**
      * Prepare active filters for renderer.
      *
      *
      */
-    private function prepareActiveFiltersForRender(ProductSearchResult $result): ?array
+    private function prepare_active_filters_for_render(Product_Search_Result $result): ?array
     {
-        $facetCollection = $result->getFacetCollection();
-
+        $facet_collection = $result->get_facet_collection();
         // not all search providers generate menus
-        if (empty($facetCollection)) {
+        if (empty($facet_collection)) {
             return null;
         }
-
-        $facetsVar = array_map(
-            [$this, 'prepareFacetForTemplate'],
-            $facetCollection->getFacets()
-        );
-
-        $displayedFacets = [];
-        $activeFilters = [];
-        foreach ($facetsVar as $facet) {
+        $facets_var = array_map([$this, 'prepareFacetForTemplate'], $facet_collection->get_facets());
+        $displayed_facets = [];
+        $active_filters = [];
+        foreach ($facets_var as $facet) {
             // Remove undisplayed facets
             if (!empty($facet['displayed'])) {
-                $displayedFacets[] = $facet;
+                $displayed_facets[] = $facet;
             }
-
             // Check if a filter is active
             foreach ($facet['filters'] as $filter) {
                 if ($filter['active']) {
-                    $activeFilters[] = $filter;
+                    $active_filters[] = $filter;
                 }
             }
         }
-
-        return [
-            $activeFilters,
-            $displayedFacets,
-            $facetsVar,
-        ];
+        return [$active_filters, $displayed_facets, $facets_var];
     }
-
     /**
      * Converts a Facet to an array with all necessary
      * information for templating.
@@ -389,168 +237,111 @@ class SearchProvider implements FacetsRendererInterface, ProductSearchProviderIn
      *
      * @return array ready for templating
      */
-    protected function prepareFacetForTemplate(Facet $facet)
+    protected function prepare_facet_for_template(Facet $facet)
     {
-        $facetsArray = $facet->toArray();
-        foreach ($facetsArray['filters'] as &$filter) {
-            $filter['facetLabel'] = $facet->getLabel();
-            if ($filter['nextEncodedFacets'] || $facet->getWidgetType() === 'slider') {
-                $filter['nextEncodedFacetsURL'] = $this->updateQueryString([
-                    'q' => $filter['nextEncodedFacets'],
-                    'page' => null,
-                ]);
+        $facets_array = $facet->to_array();
+        foreach ($facets_array['filters'] as &$filter) {
+            $filter['facetLabel'] = $facet->get_label();
+            if ($filter['nextEncodedFacets'] || $facet->get_widget_type() === 'slider') {
+                $filter['nextEncodedFacetsURL'] = $this->update_query_string(['q' => $filter['nextEncodedFacets'], 'page' => null]);
             } else {
-                $filter['nextEncodedFacetsURL'] = $this->updateQueryString([
-                    'q' => null,
-                ]);
+                $filter['nextEncodedFacetsURL'] = $this->update_query_string(['q' => null]);
             }
         }
         unset($filter);
-
-        return $facetsArray;
+        return $facets_array;
     }
-
     /**
      * Add a label associated with the facets
      */
-    private function labelRangeFilters(array $facets): void
+    private function label_range_filters(array $facets): void
     {
-        $context = $this->module->getContext();
-
+        $context = $this->module->get_context();
         foreach ($facets as $facet) {
-            if (!in_array($facet->getType(), Filters\Converter::RANGE_FILTERS)) {
+            if (!in_array($facet->get_type(), Filters\Converter::RANGE_FILTERS)) {
                 continue;
             }
-
-            foreach ($facet->getFilters() as $filter) {
-                $filterValue = $filter->getValue();
-                $min = empty($filterValue[0]) ? $facet->getProperty('min') : $filterValue[0];
-                $max = empty($filterValue[1]) ? $facet->getProperty('max') : $filterValue[1];
-                if ($facet->getType() === 'weight') {
+            foreach ($facet->get_filters() as $filter) {
+                $filter_value = $filter->get_value();
+                $min = empty($filter_value[0]) ? $facet->get_property('min') : $filter_value[0];
+                $max = empty($filter_value[1]) ? $facet->get_property('max') : $filter_value[1];
+                if ($facet->get_type() === 'weight') {
                     $unit = Configuration::get('PS_WEIGHT_UNIT');
-                    $filter->setLabel(
-                        sprintf(
-                            '%1$s %2$s - %3$s %4$s',
-                            $context->getCurrentLocale()->formatNumber($min),
-                            $unit,
-                            $context->getCurrentLocale()->formatNumber($max),
-                            $unit
-                        )
-                    );
-                } elseif ($facet->getType() === 'price') {
-                    $filter->setLabel(
-                        sprintf(
-                            '%1$s - %2$s',
-                            $context->getCurrentLocale()->formatPrice($min, $context->currency->iso_code),
-                            $context->getCurrentLocale()->formatPrice($max, $context->currency->iso_code)
-                        )
-                    );
+                    $filter->set_label(sprintf('%1$s %2$s - %3$s %4$s', $context->get_current_locale()->format_number($min), $unit, $context->get_current_locale()->format_number($max), $unit));
+                } elseif ($facet->get_type() === 'price') {
+                    $filter->set_label(sprintf('%1$s - %2$s', $context->get_current_locale()->format_price($min, $context->currency->iso_code), $context->get_current_locale()->format_price($max, $context->currency->iso_code)));
                 }
             }
         }
     }
-
     /**
      * This method generates a URL stub for each filter inside the given facets
      * and assigns this stub to the filters.
      * The URL stub is called 'nextEncodedFacets' because it is used
      * to generate the URL of the search once a filter is activated.
      */
-    private function addEncodedFacetsToFilters(array $facets): void
+    private function add_encoded_facets_to_filters(array $facets): void
     {
         // first get the currently active facetFilter in an array
-        $originalFacetFilters = $this->urlSerializer->getActiveFacetFiltersFromFacets($facets);
-
+        $original_facet_filters = $this->url_serializer->get_active_facet_filters_from_facets($facets);
         foreach ($facets as $facet) {
-            $activeFacetFilters = $originalFacetFilters;
+            $active_facet_filters = $original_facet_filters;
             // If only one filter can be selected, we keep track of
             // the current active filter to disable it before generating the url stub
             // and not select two filters in a facet that can have only one active filter.
-            if (!$facet->isMultipleSelectionAllowed() && !$facet->getProperty('range')) {
-                foreach ($facet->getFilters() as $filter) {
-                    if ($filter->isActive()) {
+            if (!$facet->is_multiple_selection_allowed() && !$facet->get_property('range')) {
+                foreach ($facet->get_filters() as $filter) {
+                    if ($filter->is_active()) {
                         // we have a currently active filter is the facet, remove it from the facetFilter array
-                        $activeFacetFilters = $this->urlSerializer->removeFilterFromFacetFilters(
-                            $originalFacetFilters,
-                            $filter,
-                            $facet
-                        );
+                        $active_facet_filters = $this->url_serializer->remove_filter_from_facet_filters($original_facet_filters, $filter, $facet);
                         break;
                     }
                 }
             }
-
-            foreach ($facet->getFilters() as $filter) {
+            foreach ($facet->get_filters() as $filter) {
                 // toggle the current filter
-                if ($filter->isActive() || $facet->getProperty('range')) {
-                    $facetFilters = $this->urlSerializer->removeFilterFromFacetFilters(
-                        $activeFacetFilters,
-                        $filter,
-                        $facet
-                    );
+                if ($filter->is_active() || $facet->get_property('range')) {
+                    $facet_filters = $this->url_serializer->remove_filter_from_facet_filters($active_facet_filters, $filter, $facet);
                 } else {
-                    $facetFilters = $this->urlSerializer->addFilterToFacetFilters(
-                        $activeFacetFilters,
-                        $filter,
-                        $facet
-                    );
+                    $facet_filters = $this->url_serializer->add_filter_to_facet_filters($active_facet_filters, $filter, $facet);
                 }
-
                 // We've toggled the filter, so the call to serialize
                 // returns the "URL" for the search when user has toggled
                 // the filter.
-                $filter->setNextEncodedFacets(
-                    $this->urlSerializer->serialize($facetFilters)
-                );
+                $filter->set_next_encoded_facets($this->url_serializer->serialize($facet_filters));
             }
         }
     }
-
     /**
      * Remove the facet when there's only 1 result.
      * Keep facet status when it's a slider.
      * Keep facet status if it's a availability or extras facet.
      */
-    private function hideUselessFacets(array $facets, int $totalProducts): void
+    private function hide_useless_facets(array $facets, int $total_products): void
     {
         foreach ($facets as $facet) {
             // If the facet is a slider type, we hide it ONLY if the MIN and MAX value match
-            if ($facet->getWidgetType() === 'slider') {
-                $facet->setDisplayed(
-                    $facet->getProperty('min') != $facet->getProperty('max')
-                );
+            if ($facet->get_widget_type() === 'slider') {
+                $facet->set_displayed($facet->get_property('min') != $facet->get_property('max'));
                 continue;
             }
-
             // Now the rest of facets - we apply this logic
-            $totalFacetProducts = 0;
-            $usefulFiltersCount = 0;
-            foreach ($facet->getFilters() as $filter) {
-                if ($filter->getMagnitude() > 0 && $filter->isDisplayed()) {
-                    $totalFacetProducts += $filter->getMagnitude();
-                    ++$usefulFiltersCount;
+            $total_facet_products = 0;
+            $useful_filters_count = 0;
+            foreach ($facet->get_filters() as $filter) {
+                if ($filter->get_magnitude() > 0 && $filter->is_displayed()) {
+                    $total_facet_products += $filter->get_magnitude();
+                    ++$useful_filters_count;
                 }
             }
-
             // We display the facet in several cases
-            $facet->setDisplayed(
+            $facet->set_displayed(
                 // If there are two filters available
-                $usefulFiltersCount > 1
-                ||
-                // There is only one filter available, but it furhter reduces the product selection
-                (
-                    count($facet->getFilters()) === 1
-                    && $totalFacetProducts < $totalProducts
-                    && $usefulFiltersCount > 0
-                )
-                ||
-                // If there is only one filter, but it's availability or extras filter - we want this one to be displayed all the time
-                ($usefulFiltersCount === 1 && ($facet->getType() == 'availability' || $facet->getType() == 'extras'))
+                $useful_filters_count > 1 || count($facet->get_filters()) === 1 && $total_facet_products < $total_products && $useful_filters_count > 0 || $useful_filters_count === 1 && ($facet->get_type() == 'availability' || $facet->get_type() == 'extras')
             );
             // Other cases - hidden by default
         }
     }
-
     /**
      * Generate a URL corresponding to the current page but
      * with the query string altered.
@@ -558,18 +349,17 @@ class SearchProvider implements FacetsRendererInterface, ProductSearchProviderIn
      * Params from $extraParams that have a null value are stripped,
      * and other params are added. Params not in $extraParams are unchanged.
      */
-    private function updateQueryString(array $extraParams = []): string
+    private function update_query_string(array $extra_params = []): string
     {
-        $uriWithoutParams = explode('?', $_SERVER['REQUEST_URI'])[0];
-        $url = Tools::getCurrentUrlProtocolPrefix() . $_SERVER['HTTP_HOST'] . $uriWithoutParams;
+        $uri_without_params = explode('?', $_SERVER['REQUEST_URI'])[0];
+        $url = Tools::get_current_url_protocol_prefix() . $_SERVER['HTTP_HOST'] . $uri_without_params;
         $params = [];
-        $paramsFromUri = '';
+        $params_from_uri = '';
         if (strpos($_SERVER['REQUEST_URI'], '?') !== false) {
-            $paramsFromUri = explode('?', $_SERVER['REQUEST_URI'])[1];
+            $params_from_uri = explode('?', $_SERVER['REQUEST_URI'])[1];
         }
-        parse_str($paramsFromUri, $params);
-
-        foreach ($extraParams as $key => $value) {
+        parse_str($params_from_uri, $params);
+        foreach ($extra_params as $key => $value) {
             if (null === $value) {
                 // Force clear param if null value is passed
                 unset($params[$key]);
@@ -577,18 +367,14 @@ class SearchProvider implements FacetsRendererInterface, ProductSearchProviderIn
                 $params[$key] = $value;
             }
         }
-
         foreach ($params as $key => $param) {
             if (null === $param || '' === $param) {
                 unset($params[$key]);
             }
         }
-
-        $queryString = str_replace('%2F', '/', http_build_query($params, '', '&'));
-
-        return $url . ($queryString ? "?$queryString" : '');
+        $query_string = str_replace('%2F', '/', http_build_query($params, '', '&'));
+        return $url . ($query_string ? "?{$query_string}" : '');
     }
-
     /**
      * Checks if we should return information about combinations to the core
      *
@@ -596,8 +382,8 @@ class SearchProvider implements FacetsRendererInterface, ProductSearchProviderIn
      *
      * @return bool if should add attributes to the select
      */
-    private function shouldPassCombinationIds(array $facetedSearchFilters): bool
+    private function should_pass_combination_ids(array $faceted_search_filters): bool
     {
-        return !empty($facetedSearchFilters['id_attribute_group']);
+        return !empty($faceted_search_filters['id_attribute_group']);
     }
 }

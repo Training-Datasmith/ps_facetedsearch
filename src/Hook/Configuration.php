@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
@@ -19,20 +19,16 @@ declare(strict_types=1);
  * @copyright Since 2007 PrestaShop SA and Contributors
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License 3.0 (AFL-3.0)
  */
+namespace Presta_Shop\Module\Faceted_Search\Hook;
 
-namespace PrestaShop\Module\FacetedSearch\Hook;
-
-class Configuration extends AbstractHook
+class Configuration extends Abstract_Hook
 {
-    public const AVAILABLE_HOOKS = [
-        'actionProductPreferencesPageStockSave',
-    ];
-
+    public const AVAILABLE_HOOKS = ['actionProductPreferencesPageStockSave'];
     /**
      * After save of product stock preferences form
      */
-    public function actionProductPreferencesPageStockSave(array $params): void
+    public function action_product_preferences_page_stock_save(array $params): void
     {
-        $this->module->invalidateLayeredFilterBlockCache();
+        $this->module->invalidate_layered_filter_block_cache();
     }
 }

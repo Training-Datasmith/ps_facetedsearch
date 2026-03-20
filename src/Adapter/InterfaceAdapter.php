@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
@@ -19,10 +19,9 @@ declare(strict_types=1);
  * @copyright Since 2007 PrestaShop SA and Contributors
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License 3.0 (AFL-3.0)
  */
+namespace Presta_Shop\Module\Faceted_Search\Adapter;
 
-namespace PrestaShop\Module\FacetedSearch\Adapter;
-
-interface InterfaceAdapter
+interface Interface_Adapter
 {
     /**
      * Set order by field
@@ -31,8 +30,7 @@ interface InterfaceAdapter
      *
      * @return self
      */
-    public function setOrderField($fieldName);
-
+    public function set_order_field($field_name);
     /**
      * Set the order by direction for the given field
      *
@@ -40,22 +38,19 @@ interface InterfaceAdapter
      *
      * @return self
      */
-    public function setOrderDirection($direction);
-
+    public function set_order_direction($direction);
     /**
      * Execute the search
      *
      * @return mixed
      */
     public function execute();
-
     /**
      * Get the current query
      *
      * @return string
      */
-    public function getQuery();
-
+    public function get_query();
     /**
      * Get the min & max value of the field filedName associated with the current search
      *
@@ -63,71 +58,61 @@ interface InterfaceAdapter
      *
      * @return mixed
      */
-    public function getMinMaxValue($fieldName);
-
+    public function get_min_max_value($field_name);
     /**
      * Get the min & max value of the price associated with the current search
      *
      * @return array
      */
-    public function getMinMaxPriceValue();
-
+    public function get_min_max_price_value();
     /**
      * Return order direction associated with the current search
      *
      * @return mixed
      */
-    public function getOrderDirection();
-
+    public function get_order_direction();
     /**
      * Return order field associated with the current search
      *
      * @return mixed
      */
-    public function getOrderField();
-
+    public function get_order_field();
     /**
      * Return all group fields associated with the current search
      *
      * @return mixed
      */
-    public function getGroupFields();
-
+    public function get_group_fields();
     /**
      * Return all selected fields associated with the current search
      *
      * @return mixed
      */
-    public function getSelectFields();
-
+    public function get_select_fields();
     /**
      * Return all the filters associated with the current search
      *
      * @return mixed
      */
-    public function getFilters();
-
+    public function get_filters();
     /**
      * Return all the operations filters associated with the current search
      *
      * @return mixed
      */
-    public function getOperationsFilters();
-
+    public function get_operations_filters();
     /**
      * Return the number of results associated for the current search
      *
      * @return int
      */
     public function count();
-
     /**
      * Move the current search into the "initialPopulation"
      * This initialPopulation will be used to generate the first derived table 'FROM (SELECT ...)' in the final query
      * e.g. : SELECT ... FROM (initialPopulation) p JOIN ....
      */
-    public function useFiltersAsInitialPopulation();
-
+    public function use_filters_as_initial_population();
     /**
      * Create a new SearchAdapter, keeping the initialPopulation of the current Search
      *
@@ -136,8 +121,7 @@ interface InterfaceAdapter
      *
      * @return InterfaceAdapter
      */
-    public function getFilteredSearchAdapter($resetFilter = null, $skipInitialPopulation = false);
-
+    public function get_filtered_search_adapter($reset_filter = null, $skip_initial_population = false);
     /**
      * Add a new filter with filterName, operator & values to the current search
      * If several values are provided with the = operator, it's converted automatically to a IN () in the final query
@@ -148,8 +132,7 @@ interface InterfaceAdapter
      *
      * @return self
      */
-    public function addFilter($filterName, $values, $operator = '=');
-
+    public function add_filter($filter_name, $values, $operator = '=');
     /**
      * Add a stack of operations with filterName. Operations must contains filterName, values and to the current search
      *
@@ -157,8 +140,7 @@ interface InterfaceAdapter
      *
      * @return self
      */
-    public function addOperationsFilter($filterName, array $operations);
-
+    public function add_operations_filter($filter_name, array $operations);
     /**
      * Add fieldName in the current search result. If the field already exists, it's skipped.
      *
@@ -166,8 +148,7 @@ interface InterfaceAdapter
      *
      * @return self
      */
-    public function addSelectField($fieldName);
-
+    public function add_select_field($field_name);
     /**
      * Returns the number of distinct products, group by fieldName values
      *
@@ -175,15 +156,13 @@ interface InterfaceAdapter
      *
      * @return mixed
      */
-    public function valueCount($fieldName = null);
-
+    public function value_count($field_name = null);
     /**
      * Reset the operations filters
      *
      * @return self
      */
-    public function resetOperationsFilters();
-
+    public function reset_operations_filters();
     /**
      * Reset the operations filter for the given filterName
      *
@@ -191,8 +170,7 @@ interface InterfaceAdapter
      *
      * @return self
      */
-    public function resetOperationsFilter($filterName);
-
+    public function reset_operations_filter($filter_name);
     /**
      * Reset the filter for the given filterName
      *
@@ -200,8 +178,7 @@ interface InterfaceAdapter
      *
      * @return self
      */
-    public function resetFilter($filterName);
-
+    public function reset_filter($filter_name);
     /**
      * Return the filter associated with filterName
      *
@@ -209,8 +186,7 @@ interface InterfaceAdapter
      *
      * @return mixed
      */
-    public function getFilter($filterName);
-
+    public function get_filter($filter_name);
     /**
      * Set the filterName to the given array value
      *
@@ -219,27 +195,23 @@ interface InterfaceAdapter
      *
      * @return mixed
      */
-    public function setFilter($filterName, $value);
-
+    public function set_filter($filter_name, $value);
     /**
      * Return the current initialPopulation
      *
      * @return self|null
      */
-    public function getInitialPopulation();
-
+    public function get_initial_population();
     /**
      * Return all the filters / groupFields / selectFields
      *
      * @return self
      */
-    public function resetAll();
-
+    public function reset_all();
     /**
      * Copy all the filters & operationsFilters from adapter to the current search
      */
-    public function copyFilters(InterfaceAdapter $adapter);
-
+    public function copy_filters(Interface_Adapter $adapter);
     /**
      * Set all the select fields
      *
@@ -247,15 +219,13 @@ interface InterfaceAdapter
      *
      * @return self
      */
-    public function setSelectFields($selectFields);
-
+    public function set_select_fields($select_fields);
     /**
      * Reset all the select fields
      *
      * @return self
      */
-    public function resetSelectField();
-
+    public function reset_select_field();
     /**
      * Add a group by field
      *
@@ -263,8 +233,7 @@ interface InterfaceAdapter
      *
      * @return self
      */
-    public function addGroupBy($groupField);
-
+    public function add_group_by($group_field);
     /**
      * Set the group by fields
      *
@@ -272,12 +241,11 @@ interface InterfaceAdapter
      *
      * @return self
      */
-    public function setGroupFields($groupFields);
-
+    public function set_group_fields($group_fields);
     /**
      * Reset the group by conditions
      *
      * @return self
      */
-    public function resetGroupBy();
+    public function reset_group_by();
 }

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
@@ -19,21 +19,17 @@ declare(strict_types=1);
  * @copyright Since 2007 PrestaShop SA and Contributors
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License 3.0 (AFL-3.0)
  */
+namespace Presta_Shop\Module\Faceted_Search\Hook;
 
-namespace PrestaShop\Module\FacetedSearch\Hook;
-
-class Design extends AbstractHook
+class Design extends Abstract_Hook
 {
-    public const AVAILABLE_HOOKS = [
-        'displayLeftColumn',
-    ];
-
+    public const AVAILABLE_HOOKS = ['displayLeftColumn'];
     /**
      * Force this hook to be called here instance of using WidgetInterface
      * because Hook::isHookCallableOn before the instanceof function.
      * Which means is_callable always returns true with a __call usage.
      */
-    public function displayLeftColumn(array $params)
+    public function display_left_column(array $params)
     {
         return $this->module->fetch('module:ps_facetedsearch/ps_facetedsearch.tpl');
     }

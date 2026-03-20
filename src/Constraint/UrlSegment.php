@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
@@ -19,20 +19,17 @@ declare(strict_types=1);
  * @copyright Since 2007 PrestaShop SA and Contributors
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License 3.0 (AFL-3.0)
  */
-
-namespace PrestaShop\Module\FacetedSearch\Constraint;
+namespace Presta_Shop\Module\Faceted_Search\Constraint;
 
 use Symfony\Component\Validator\Constraint;
-
-class UrlSegment extends Constraint
+class Url_Segment extends Constraint
 {
     public $message = '%s is invalid.';
-
     /**
      * {@inheritdoc}
      */
-    public function validatedBy()
+    public function validated_by()
     {
-        return UrlSegmentValidator::class;
+        return Url_Segment_Validator::class;
     }
 }

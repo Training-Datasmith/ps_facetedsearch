@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
@@ -19,52 +19,42 @@ declare(strict_types=1);
  * @copyright Since 2007 PrestaShop SA and Contributors
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License 3.0 (AFL-3.0)
  */
+namespace Presta_Shop\Module\Faceted_Search\Hook;
 
-namespace PrestaShop\Module\FacetedSearch\Hook;
-
-class SpecificPrice extends AbstractHook
+class Specific_Price extends Abstract_Hook
 {
     /**
      * @var array
      */
-    protected $productsBefore;
-
-    public const AVAILABLE_HOOKS = [
-        'actionObjectSpecificPriceRuleUpdateBefore',
-        'actionAdminSpecificPriceRuleControllerSaveAfter',
-    ];
-
+    protected $products_before;
+    public const AVAILABLE_HOOKS = ['actionObjectSpecificPriceRuleUpdateBefore', 'actionAdminSpecificPriceRuleControllerSaveAfter'];
     /**
      * Before saving a specific price rule
      */
-    public function actionObjectSpecificPriceRuleUpdateBefore(array $params): void
+    public function action_object_specific_price_rule_update_before(array $params): void
     {
         if (empty($params['object']->id)) {
             return;
         }
-
         /** @var \SpecificPriceRule */
-        $specificPrice = $params['object'];
-        $this->productsBefore = $specificPrice->getAffectedProducts();
+        $specific_price = $params['object'];
+        $this->products_before = $specific_price->get_affected_products();
     }
-
     /**
      * After saving a specific price rule
      */
-    public function actionAdminSpecificPriceRuleControllerSaveAfter(array $params): void
+    public function action_admin_specific_price_rule_controller_save_after(array $params): void
     {
-        if (empty($params['return']->id) || empty($this->productsBefore)) {
+        if (empty($params['return']->id) || empty($this->products_before)) {
             return;
         }
-
         /** @var \SpecificPriceRule */
-        $specificPrice = $params['return'];
-        $affectedProducts = array_merge($this->productsBefore, $specificPrice->getAffectedProducts());
-        foreach ($affectedProducts as $product) {
-            $this->module->indexProductPrices($product['id_product']);
-            $this->module->indexAttributes($product['id_product']);
+        $specific_price = $params['return'];
+        $affected_products = array_merge($this->products_before, $specific_price->get_affected_products());
+        foreach ($affected_products as $product) {
+            $this->module->index_product_prices($product['id_product']);
+            $this->module->index_attributes($product['id_product']);
         }
-
-        $this->module->invalidateLayeredFilterBlockCache();
+        $this->module->invalidate_layered_filter_block_cache();
     }
 }

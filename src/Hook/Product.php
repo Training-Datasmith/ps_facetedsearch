@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
@@ -19,26 +19,21 @@ declare(strict_types=1);
  * @copyright Since 2007 PrestaShop SA and Contributors
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License 3.0 (AFL-3.0)
  */
+namespace Presta_Shop\Module\Faceted_Search\Hook;
 
-namespace PrestaShop\Module\FacetedSearch\Hook;
-
-class Product extends AbstractHook
+class Product extends Abstract_Hook
 {
-    public const AVAILABLE_HOOKS = [
-        'actionProductSave',
-    ];
-
+    public const AVAILABLE_HOOKS = ['actionProductSave'];
     /**
      * After save product
      */
-    public function actionProductSave(array $params): void
+    public function action_product_save(array $params): void
     {
         if (empty($params['id_product'])) {
             return;
         }
-
-        $this->module->indexProductPrices((int) $params['id_product']);
-        $this->module->indexAttributes((int) $params['id_product']);
-        $this->module->invalidateLayeredFilterBlockCache();
+        $this->module->index_product_prices((int) $params['id_product']);
+        $this->module->index_attributes((int) $params['id_product']);
+        $this->module->invalidate_layered_filter_block_cache();
     }
 }

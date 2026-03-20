@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
@@ -19,43 +19,36 @@ declare(strict_types=1);
  * @copyright Since 2007 PrestaShop SA and Contributors
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License 3.0 (AFL-3.0)
  */
-
-namespace PrestaShop\Module\FacetedSearch\Hook;
+namespace Presta_Shop\Module\Faceted_Search\Hook;
 
 use Context;
 use Db;
 use Ps_Facetedsearch;
-
-abstract class AbstractHook
+abstract class Abstract_Hook
 {
     public const AVAILABLE_HOOKS = [];
-
     /**
      * @var Context
      */
     protected $context;
-
     /**
      * @var Ps_Facetedsearch
      */
     protected $module;
-
     /**
      * @var Db
      */
     protected $database;
-
     public function __construct(Ps_Facetedsearch $module)
     {
         $this->module = $module;
-        $this->context = $module->getContext();
-        $this->database = $module->getDatabase();
+        $this->context = $module->get_context();
+        $this->database = $module->get_database();
     }
-
     /**
      * @return array
      */
-    public function getAvailableHooks()
+    public function get_available_hooks()
     {
         return static::AVAILABLE_HOOKS;
     }

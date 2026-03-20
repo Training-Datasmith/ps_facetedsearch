@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
@@ -19,108 +19,84 @@ declare(strict_types=1);
  * @copyright Since 2007 PrestaShop SA and Contributors
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License 3.0 (AFL-3.0)
  */
-
-namespace PrestaShop\Module\FacetedSearch\Hook;
+namespace Presta_Shop\Module\Faceted_Search\Hook;
 
 use Configuration;
 use Tools;
-
-class Category extends AbstractHook
+class Category extends Abstract_Hook
 {
-    public const AVAILABLE_HOOKS = [
-        'actionCategoryAdd',
-        'actionCategoryDelete',
-    ];
-
+    public const AVAILABLE_HOOKS = ['actionCategoryAdd', 'actionCategoryDelete'];
     /**
      * Category addition
      */
-    public function actionCategoryAdd(array $params): void
+    public function action_category_add(array $params): void
     {
-        $this->addCategoryToDefaultFilter((int) $params['category']->id);
-
+        $this->add_category_to_default_filter((int) $params['category']->id);
         // Flush filter block cache in all cases, so a new category shows up
-        $this->module->invalidateLayeredFilterBlockCache();
+        $this->module->invalidate_layered_filter_block_cache();
     }
-
     /**
      * Category deletion
      */
-    public function actionCategoryDelete(array $params): void
+    public function action_category_delete(array $params): void
     {
-        $this->removeCategoryFromFilterTemplates((int) $params['category']->id);
+        $this->remove_category_from_filter_templates((int) $params['category']->id);
     }
-
     /**
      * Clean and rebuild category filters
      */
-    private function removeCategoryFromFilterTemplates(int $idCategory): void
+    private function remove_category_from_filter_templates(int $id_category): void
     {
         // Get all filter templates
-        $filterTemplates = $this->database->executeS(
-            'SELECT * FROM ' . _DB_PREFIX_ . 'layered_filter'
-        );
-
-        $rebuildNeeded = false;
-
+        $filter_templates = $this->database->execute_s('SELECT * FROM ' . _DB_PREFIX_ . 'layered_filter');
+        $rebuild_needed = false;
         // Go through each template, check if our category is set for this template.
         // If yes, remove it and update the template.
-        foreach ($filterTemplates as $template) {
-            $filters = Tools::unSerialize($template['filters']);
-            if (!in_array($idCategory, $filters['categories'])) {
+        foreach ($filter_templates as $template) {
+            $filters = Tools::un_serialize($template['filters']);
+            if (!in_array($id_category, $filters['categories'])) {
                 continue;
             }
-            unset($filters['categories'][array_search($idCategory, $filters['categories'])]);
-            $rebuildNeeded = true;
-            $this->database->execute(
-                'UPDATE `' . _DB_PREFIX_ . 'layered_filter` 
-                SET `filters` = "' . pSQL(serialize($filters)) . '", 
+            unset($filters['categories'][array_search($id_category, $filters['categories'])]);
+            $rebuild_needed = true;
+            $this->database->execute('UPDATE `' . _DB_PREFIX_ . 'layered_filter` 
+                SET `filters` = "' . p_sql(serialize($filters)) . '", 
                 n_categories = ' . count($filters['categories']) . ' 
-                WHERE `id_layered_filter` = ' . (int) $template['id_layered_filter']
-            );
+                WHERE `id_layered_filter` = ' . (int) $template['id_layered_filter']);
         }
-
         // Rebuild filter table only if a category was removed from a filter
-        if ($rebuildNeeded) {
-            $this->module->buildLayeredCategories();
+        if ($rebuild_needed) {
+            $this->module->build_layered_categories();
         }
-
         // Flush cache all the time, because the category could be cached in a category filter block
-        $this->module->invalidateLayeredFilterBlockCache();
+        $this->module->invalidate_layered_filter_block_cache();
     }
-
     /**
      * Checks if module is configured to automatically add some filter to new categories.
      * If so, it adds the new category.
      *
      * @param int $idCategory ID of category being created
      */
-    public function addCategoryToDefaultFilter(int $idCategory): void
+    public function add_category_to_default_filter(int $id_category): void
     {
         // Get default template
-        $defaultFilterTemplateId = (int) Configuration::get('PS_LAYERED_DEFAULT_CATEGORY_TEMPLATE');
-        if (empty($defaultFilterTemplateId)) {
+        $default_filter_template_id = (int) Configuration::get('PS_LAYERED_DEFAULT_CATEGORY_TEMPLATE');
+        if (empty($default_filter_template_id)) {
             return;
         }
-
         // Try to get it's data
-        $template = $this->module->getFilterTemplate($defaultFilterTemplateId);
+        $template = $this->module->get_filter_template($default_filter_template_id);
         if (empty($template)) {
             return;
         }
-
         // Unserialize filters, add our category
-        $filters = Tools::unSerialize($template['filters']);
-        $filters['categories'][] = $idCategory;
-
+        $filters = Tools::un_serialize($template['filters']);
+        $filters['categories'][] = $id_category;
         // Update it in database
-        $this->database->execute(
-            'UPDATE `' . _DB_PREFIX_ . 'layered_filter` 
-            SET `filters` = "' . pSQL(serialize($filters)) . '", 
+        $this->database->execute('UPDATE `' . _DB_PREFIX_ . 'layered_filter` 
+            SET `filters` = "' . p_sql(serialize($filters)) . '", 
             n_categories = ' . count($filters['categories']) . ' 
-            WHERE `id_layered_filter` = ' . $defaultFilterTemplateId
-        );
-
-        $this->module->buildLayeredCategories();
+            WHERE `id_layered_filter` = ' . $default_filter_template_id);
+        $this->module->build_layered_categories();
     }
 }

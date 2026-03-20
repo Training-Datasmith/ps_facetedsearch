@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
@@ -19,120 +19,85 @@ declare(strict_types=1);
  * @copyright Since 2007 PrestaShop SA and Contributors
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License 3.0 (AFL-3.0)
  */
-
-namespace PrestaShop\Module\FacetedSearch\Hook;
+namespace Presta_Shop\Module\Faceted_Search\Hook;
 
 use Configuration;
-use PrestaShop\Module\FacetedSearch\Filters\Converter;
-use PrestaShop\Module\FacetedSearch\Filters\DataAccessor;
-use PrestaShop\Module\FacetedSearch\Filters\Provider;
-use PrestaShop\Module\FacetedSearch\Product\SearchFactory;
-use PrestaShop\Module\FacetedSearch\Product\SearchProvider;
-use PrestaShop\Module\FacetedSearch\URLSerializer;
-use PrestaShop\PrestaShop\Core\Product\Search\ProductSearchQuery;
-use PrestaShop\PrestaShop\Core\Product\Search\SortOrder;
-
-class ProductSearch extends AbstractHook
+use Presta_Shop\Module\Faceted_Search\Filters\Converter;
+use Presta_Shop\Module\Faceted_Search\Filters\Data_Accessor;
+use Presta_Shop\Module\Faceted_Search\Filters\Provider;
+use Presta_Shop\Module\Faceted_Search\Product\Search_Factory;
+use Presta_Shop\Module\Faceted_Search\Product\Search_Provider;
+use Presta_Shop\Module\Faceted_Search\Url_Serializer;
+use Presta_Shop\Presta_Shop\Core\Product\Search\Product_Search_Query;
+use Presta_Shop\Presta_Shop\Core\Product\Search\Sort_Order;
+class Product_Search extends Abstract_Hook
 {
-    public const AVAILABLE_HOOKS = [
-        'productSearchProvider',
-    ];
-
+    public const AVAILABLE_HOOKS = ['productSearchProvider'];
     /**
      * This method returns the search provider to the controller who requested it.
      *
      *
      */
-    public function productSearchProvider(array $params): ?\PrestaShop\Module\FacetedSearch\Product\SearchProvider
+    public function product_search_provider(array $params): ?\Presta_Shop\Module\Faceted_Search\Product\Search_Provider
     {
         /*
          * Backward compatibility, required for versions < 8.0
          * We need to assign missing queryType to some controllers, which don't report it.
          * Remove when module minimum compatibility reaches 8.0.
          */
-        if (empty($params['query']->getQueryType())) {
-            $params['query'] = $this->assignMissingQueryType($params['query']);
+        if (empty($params['query']->get_query_type())) {
+            $params['query'] = $this->assign_missing_query_type($params['query']);
         }
-
         /*
          * Check if the type of query (controller) is supported by our module. If not, we
          * let the core do the search.
          */
-        if ($this->module->isControllerSupported($params['query']->getQueryType()) === false) {
+        if ($this->module->is_controller_supported($params['query']->get_query_type()) === false) {
             return null;
         }
-
         // Initialize provider, we will need it right away to check if there are filters setup
-        $provider = new Provider($this->module->getDatabase());
-
+        $provider = new Provider($this->module->get_database());
         /*
          * If search controller is not specifically enabled, we don't return the instance.
          * This condition will be removed when search controller support is fully implemented.
          */
-        if ($params['query']->getQueryType() === 'search'
-            && empty($provider->getFiltersForQuery($params['query'], (int) $this->context->shop->id))) {
+        if ($params['query']->get_query_type() === 'search' && empty($provider->get_filters_for_query($params['query'], (int) $this->context->shop->id))) {
             return null;
         }
-
         /*
          * Fix wrong reporting of desired best sales order. BestSalesProductSearchProvider overrides
          * the sort set on the query in BestSalesControllerCore.
          */
-        if ($params['query']->getQueryType() == 'best-sales') {
-            $params['query']->setSortOrder(new SortOrder('product', 'sales', 'desc'));
+        if ($params['query']->get_query_type() == 'best-sales') {
+            $params['query']->set_sort_order(new Sort_Order('product', 'sales', 'desc'));
         }
-
         // Assign assets
         if ((bool) Configuration::get('PS_USE_JQUERY_UI_SLIDER')) {
-            $this->context->controller->addJqueryUi('ui.slider');
+            $this->context->controller->add_jquery_ui('ui.slider');
         }
-        $this->context->controller->registerStylesheet(
-            'facetedsearch_front',
-            '/modules/ps_facetedsearch/views/dist/front.css'
-        );
-        $this->context->controller->registerJavascript(
-            'facetedsearch_front',
-            '/modules/ps_facetedsearch/views/dist/front.js',
-            ['position' => 'bottom', 'priority' => 100]
-        );
-
-        $urlSerializer = new URLSerializer();
-        $dataAccessor = new DataAccessor($this->module->getDatabase());
-
+        $this->context->controller->register_stylesheet('facetedsearch_front', '/modules/ps_facetedsearch/views/dist/front.css');
+        $this->context->controller->register_javascript('facetedsearch_front', '/modules/ps_facetedsearch/views/dist/front.js', ['position' => 'bottom', 'priority' => 100]);
+        $url_serializer = new Url_Serializer();
+        $data_accessor = new Data_Accessor($this->module->get_database());
         // Return an instance of our searcher, ready to accept requests
-        return new SearchProvider(
-            $this->module,
-            new Converter(
-                $this->module->getContext(),
-                $this->module->getDatabase(),
-                $urlSerializer,
-                $dataAccessor,
-                $provider
-            ),
-            $urlSerializer,
-            $dataAccessor,
-            new SearchFactory(),
-            $provider
-        );
+        return new Search_Provider($this->module, new Converter($this->module->get_context(), $this->module->get_database(), $url_serializer, $data_accessor, $provider), $url_serializer, $data_accessor, new Search_Factory(), $provider);
     }
-
     /**
      * Assign missing queryType, required for PS versions < 8.0
      *
      *
      */
-    private function assignMissingQueryType(ProductSearchQuery $query): ProductSearchQuery
+    private function assign_missing_query_type(Product_Search_Query $query): Product_Search_Query
     {
-        if (!empty($query->getIdCategory())) {
-            $query->setQueryType('category');
-        } elseif (!empty($query->getIdManufacturer())) {
-            $query->setQueryType('manufacturer');
-        } elseif (!empty($query->getIdSupplier())) {
-            $query->setQueryType('supplier');
-        } elseif (!empty($query->getSearchString()) || !empty($query->getSearchTag())) {
-            $query->setQueryType('search');
+        if (!empty($query->get_id_category())) {
+            $query->set_query_type('category');
+        } elseif (!empty($query->get_id_manufacturer())) {
+            $query->set_query_type('manufacturer');
+        } elseif (!empty($query->get_id_supplier())) {
+            $query->set_query_type('supplier');
+        } elseif (!empty($query->get_search_string()) || !empty($query->get_search_tag())) {
+            $query->set_query_type('search');
         }
-
         return $query;
     }
 }

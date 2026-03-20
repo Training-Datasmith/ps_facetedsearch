@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
@@ -19,85 +19,34 @@ declare(strict_types=1);
  * @copyright Since 2007 PrestaShop SA and Contributors
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License 3.0 (AFL-3.0)
  */
-
-namespace PrestaShop\Module\FacetedSearch\Form\FeatureValue;
+namespace Presta_Shop\Module\Faceted_Search\Form\Feature_Value;
 
 use Context;
-use PrestaShop\Module\FacetedSearch\Constraint\UrlSegment;
-use PrestaShopBundle\Form\Admin\Type\TranslatableType;
-use PrestaShopBundle\Translation\DataCollectorTranslator;
-use PrestaShopBundle\Translation\TranslatorComponent;
-use Symfony\Component\Form\FormBuilderInterface;
-
+use Presta_Shop\Module\Faceted_Search\Constraint\Url_Segment;
+use Presta_Shop_Bundle\Form\Admin\Type\Translatable_Type;
+use Presta_Shop_Bundle\Translation\Data_Collector_Translator;
+use Presta_Shop_Bundle\Translation\Translator_Component;
+use Symfony\Component\Form\Form_Builder_Interface;
 /**
  * Adds module specific fields to BO form
  */
-class FormModifier
+class Form_Modifier
 {
     /**
      * @var Context
      */
     private $context;
-
     public function __construct(Context $context)
     {
         $this->context = $context;
     }
-
-    public function modify(
-        FormBuilderInterface $formBuilder,
-        array $data
-    ): void {
+    public function modify(Form_Builder_Interface $form_builder, array $data): void
+    {
         /** @var DataCollectorTranslator|TranslatorComponent $translator */
-        $translator = $this->context->getTranslator();
-        $invalidCharsHint = $translator->trans(
-            'Invalid characters: <>;=#{}_',
-            [],
-            'Modules.Facetedsearch.Admin'
-        );
-
-        $urlTip = $translator->trans(
-            'When the Faceted Search module is enabled, you can get more detailed URLs by choosing ' .
-            'the word that best represents this feature. By default, PrestaShop uses the ' .
-            'feature\'s value, but you can change that setting using this field.',
-            [],
-            'Modules.Facetedsearch.Admin'
-        );
-        $metaTitleTip = $translator->trans(
-            'When the Faceted Search module is enabled, you can get more detailed page titles by ' .
-            'choosing the word that best represents this feature. By default, PrestaShop uses the ' .
-            'feature\'s value, but you can change that setting using this field.',
-            [],
-            'Modules.Facetedsearch.Admin'
-        );
-
-        $formBuilder
-            ->add(
-                'url_name',
-                TranslatableType::class,
-                [
-                    'required' => false,
-                    'label' => $translator->trans('URL', [], 'Modules.Facetedsearch.Admin'),
-                    'help' => $urlTip . ' ' . $invalidCharsHint,
-                    'options' => [
-                        'constraints' => [
-                            new UrlSegment([
-                                'message' => $translator->trans('%s is invalid.', [], 'Admin.Notifications.Error'),
-                            ]),
-                        ],
-                    ],
-                    'data' => $data['url'],
-                ]
-            )
-            ->add(
-                'meta_title',
-                TranslatableType::class,
-                [
-                    'required' => false,
-                    'label' => $translator->trans('Meta title', [], 'Modules.Facetedsearch.Admin'),
-                    'help' => $metaTitleTip,
-                    'data' => $data['meta_title'],
-                ]
-            );
+        $translator = $this->context->get_translator();
+        $invalid_chars_hint = $translator->trans('Invalid characters: <>;=#{}_', [], 'Modules.Facetedsearch.Admin');
+        $url_tip = $translator->trans('When the Faceted Search module is enabled, you can get more detailed URLs by choosing ' . 'the word that best represents this feature. By default, PrestaShop uses the ' . 'feature\'s value, but you can change that setting using this field.', [], 'Modules.Facetedsearch.Admin');
+        $meta_title_tip = $translator->trans('When the Faceted Search module is enabled, you can get more detailed page titles by ' . 'choosing the word that best represents this feature. By default, PrestaShop uses the ' . 'feature\'s value, but you can change that setting using this field.', [], 'Modules.Facetedsearch.Admin');
+        $form_builder->add('url_name', Translatable_Type::class, ['required' => false, 'label' => $translator->trans('URL', [], 'Modules.Facetedsearch.Admin'), 'help' => $url_tip . ' ' . $invalid_chars_hint, 'options' => ['constraints' => [new Url_Segment(['message' => $translator->trans('%s is invalid.', [], 'Admin.Notifications.Error')])]], 'data' => $data['url']])->add('meta_title', Translatable_Type::class, ['required' => false, 'label' => $translator->trans('Meta title', [], 'Modules.Facetedsearch.Admin'), 'help' => $meta_title_tip, 'data' => $data['meta_title']]);
     }
 }

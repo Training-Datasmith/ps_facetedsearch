@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
@@ -19,57 +19,42 @@ declare(strict_types=1);
  * @copyright Since 2007 PrestaShop SA and Contributors
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License 3.0 (AFL-3.0)
  */
-
-namespace PrestaShop\Module\FacetedSearch\Form\FeatureValue;
+namespace Presta_Shop\Module\Faceted_Search\Form\Feature_Value;
 
 use Db;
-
 /**
  * Provides form data
  */
-class FormDataProvider
+class Form_Data_Provider
 {
     /**
      * @var Db
      */
     private $database;
-
     public function __construct(Db $database)
     {
         $this->database = $database;
     }
-
     /**
      * Fills form data
      *
      *
      */
-    public function getData(array $params): array
+    public function get_data(array $params): array
     {
-        $defaultUrl = [];
-        $defaultMetaTitle = [];
-
+        $default_url = [];
+        $default_meta_title = [];
         // if params contains id, gets data for edit form
         if (!empty($params['id'])) {
-            $featureValueId = (int) $params['id'];
-
-            $result = $this->database->executeS(
-                'SELECT `url_name`, `meta_title`, `id_lang` ' .
-                'FROM ' . _DB_PREFIX_ . 'layered_indexable_feature_value_lang_value ' .
-                'WHERE `id_feature_value` = ' . $featureValueId
-            );
-
+            $feature_value_id = (int) $params['id'];
+            $result = $this->database->execute_s('SELECT `url_name`, `meta_title`, `id_lang` ' . 'FROM ' . _DB_PREFIX_ . 'layered_indexable_feature_value_lang_value ' . 'WHERE `id_feature_value` = ' . $feature_value_id);
             if (!empty($result) && is_array($result)) {
                 foreach ($result as $data) {
-                    $defaultUrl[$data['id_lang']] = $data['url_name'];
-                    $defaultMetaTitle[$data['id_lang']] = $data['meta_title'];
+                    $default_url[$data['id_lang']] = $data['url_name'];
+                    $default_meta_title[$data['id_lang']] = $data['meta_title'];
                 }
             }
         }
-
-        return [
-            'url' => $defaultUrl,
-            'meta_title' => $defaultMetaTitle,
-        ];
+        return ['url' => $default_url, 'meta_title' => $default_meta_title];
     }
 }

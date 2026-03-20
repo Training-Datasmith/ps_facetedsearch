@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
@@ -19,12 +19,10 @@ declare(strict_types=1);
  * @copyright Since 2007 PrestaShop SA and Contributors
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License 3.0 (AFL-3.0)
  */
-
-namespace PrestaShop\Module\FacetedSearch\Filters;
+namespace Presta_Shop\Module\Faceted_Search\Filters;
 
 use Db;
-use PrestaShop\PrestaShop\Core\Product\Search\ProductSearchQuery;
-
+use Presta_Shop\Presta_Shop\Core\Product\Search\Product_Search_Query;
 /**
  * Class responsible for providing filters configured for current search query
  */
@@ -34,35 +32,29 @@ class Provider
      * @var array
      */
     private $filters = [];
-
     /**
      * @var Db
      */
     private $database;
-
     public function __construct(Db $database)
     {
         $this->database = $database;
     }
-
     /**
      * Get filters for current search query
      *
      *
      * @return array Filters
      */
-    public function getFiltersForQuery(ProductSearchQuery $query, int $idShop)
+    public function get_filters_for_query(Product_Search_Query $query, int $id_shop)
     {
         if (empty($this->filters)) {
-            $this->filters = $this->database->executeS(
-                'SELECT type, id_value, filter_show_limit, filter_type FROM ' . _DB_PREFIX_ . 'layered_category
-            WHERE controller = \'' . $query->getQueryType() . '\'
-            AND id_category = ' . ($query->getQueryType() == 'category' ? (int) $query->getIdCategory() : 0) . '
-            AND id_shop = ' . $idShop . '
-            GROUP BY `type`, id_value ORDER BY position ASC'
-            );
+            $this->filters = $this->database->execute_s('SELECT type, id_value, filter_show_limit, filter_type FROM ' . _DB_PREFIX_ . 'layered_category
+            WHERE controller = \'' . $query->get_query_type() . '\'
+            AND id_category = ' . ($query->get_query_type() == 'category' ? (int) $query->get_id_category() : 0) . '
+            AND id_shop = ' . $id_shop . '
+            GROUP BY `type`, id_value ORDER BY position ASC');
         }
-
         return $this->filters;
     }
 }

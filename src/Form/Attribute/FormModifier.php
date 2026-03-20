@@ -24,24 +24,20 @@
  * @copyright Since 2007 PrestaShop SA and Contributors
  * @license   https://opensource.org/licenses/OSL-3.0 Open Software License (OSL 3.0)
  */
+declare (strict_types=1);
+namespace Presta_Shop\Module\Faceted_Search\Form\Attribute;
 
-declare(strict_types=1);
-
-namespace PrestaShop\Module\FacetedSearch\Form\Attribute;
-
-use PrestaShop\Module\FacetedSearch\Constraint\UrlSegment;
-use PrestaShopBundle\Form\Admin\Type\TranslatableType;
-use PrestaShopBundle\Translation\DataCollectorTranslator;
-use PrestaShopBundle\Translation\TranslatorComponent;
-use Symfony\Component\Form\FormBuilderInterface;
-
-class FormModifier
+use Presta_Shop\Module\Faceted_Search\Constraint\Url_Segment;
+use Presta_Shop_Bundle\Form\Admin\Type\Translatable_Type;
+use Presta_Shop_Bundle\Translation\Data_Collector_Translator;
+use Presta_Shop_Bundle\Translation\Translator_Component;
+use Symfony\Component\Form\Form_Builder_Interface;
+class Form_Modifier
 {
     /**
      * @var DataCollectorTranslator|TranslatorComponent
      */
     private $translator;
-
     /**
      * @param DataCollectorTranslator|TranslatorComponent $translator
      */
@@ -49,52 +45,11 @@ class FormModifier
     {
         $this->translator = $translator;
     }
-
-    public function modify(FormBuilderInterface $formBuilder): void
+    public function modify(Form_Builder_Interface $form_builder): void
     {
-        $invalidCharsHint = $this->translator->trans(
-            'Invalid characters: <>;=#{}_',
-            [],
-            'Modules.Facetedsearch.Admin'
-        );
-
-        $urlTip = $this->translator->trans(
-            'When the Faceted Search module is enabled, you can get more detailed URLs by choosing the word that best represent this attribute. By default, PrestaShop uses the attribute\'s name, but you can change that setting using this field.',
-            [],
-            'Modules.Facetedsearch.Admin'
-        );
-        $metaTitleTip = $this->translator->trans(
-            'When the Faceted Search module is enabled, you can get more detailed page titles by choosing the word that best represent this attribute. By default, PrestaShop uses the attribute\'s name, but you can change that setting using this field.',
-            [],
-            'Modules.Facetedsearch.Admin'
-        );
-
-        $formBuilder
-            ->add(
-                'url_name',
-                TranslatableType::class,
-                [
-                    'required' => false,
-                    'label' => $this->translator->trans('URL', [], 'Modules.Facetedsearch.Admin'),
-                    'help' => $urlTip . ' ' . $invalidCharsHint,
-                    'options' => [
-                        'constraints' => [
-                            new UrlSegment([
-                                'message' => $this->translator->trans('%s is invalid.', [], 'Admin.Notifications.Error'),
-                            ]),
-                        ],
-                    ],
-                ]
-            )
-            ->add(
-                'meta_title',
-                TranslatableType::class,
-                [
-                    'required' => false,
-                    'label' => $this->translator->trans('Meta title', [], 'Modules.Facetedsearch.Admin'),
-                    'help' => $metaTitleTip,
-                ]
-            )
-        ;
+        $invalid_chars_hint = $this->translator->trans('Invalid characters: <>;=#{}_', [], 'Modules.Facetedsearch.Admin');
+        $url_tip = $this->translator->trans('When the Faceted Search module is enabled, you can get more detailed URLs by choosing the word that best represent this attribute. By default, PrestaShop uses the attribute\'s name, but you can change that setting using this field.', [], 'Modules.Facetedsearch.Admin');
+        $meta_title_tip = $this->translator->trans('When the Faceted Search module is enabled, you can get more detailed page titles by choosing the word that best represent this attribute. By default, PrestaShop uses the attribute\'s name, but you can change that setting using this field.', [], 'Modules.Facetedsearch.Admin');
+        $form_builder->add('url_name', Translatable_Type::class, ['required' => false, 'label' => $this->translator->trans('URL', [], 'Modules.Facetedsearch.Admin'), 'help' => $url_tip . ' ' . $invalid_chars_hint, 'options' => ['constraints' => [new Url_Segment(['message' => $this->translator->trans('%s is invalid.', [], 'Admin.Notifications.Error')])]]])->add('meta_title', Translatable_Type::class, ['required' => false, 'label' => $this->translator->trans('Meta title', [], 'Modules.Facetedsearch.Admin'), 'help' => $meta_title_tip]);
     }
 }

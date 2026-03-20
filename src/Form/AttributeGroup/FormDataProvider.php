@@ -24,26 +24,21 @@
  * @copyright Since 2007 PrestaShop SA and Contributors
  * @license   https://opensource.org/licenses/OSL-3.0 Open Software License (OSL 3.0)
  */
-
-declare(strict_types=1);
-
-namespace PrestaShop\Module\FacetedSearch\Form\AttributeGroup;
+declare (strict_types=1);
+namespace Presta_Shop\Module\Faceted_Search\Form\Attribute_Group;
 
 use Db;
-use PrestaShopDatabaseException;
-
-class FormDataProvider
+use Presta_Shop_Database_Exception;
+class Form_Data_Provider
 {
     /**
      * @var Db
      */
     private $database;
-
     public function __construct(Db $database)
     {
         $this->database = $database;
     }
-
     /**
      * Fills form data
      *
@@ -51,42 +46,25 @@ class FormDataProvider
      *
      * @throws PrestaShopDatabaseException
      */
-    public function getData(array $params): array
+    public function get_data(array $params): array
     {
-        $defaultUrl = [];
-        $defaultMetaTitle = [];
-        $isIndexable = false;
-
+        $default_url = [];
+        $default_meta_title = [];
+        $is_indexable = false;
         // if params contains id, gets data for edit form
         if (!empty($params['id'])) {
-            $attributeGroupId = (int) $params['id'];
-
+            $attribute_group_id = (int) $params['id'];
             // returns false if request failed.
-            $queryIndexable = $this->database->getValue(
-                'SELECT `indexable` ' .
-                'FROM ' . _DB_PREFIX_ . 'layered_indexable_attribute_group ' .
-                'WHERE `id_attribute_group` = ' . $attributeGroupId
-            );
-
-            $isIndexable = (bool) $queryIndexable;
-            $result = $this->database->executeS(
-                'SELECT `url_name`, `meta_title`, `id_lang` ' .
-                'FROM ' . _DB_PREFIX_ . 'layered_indexable_attribute_group_lang_value ' .
-                'WHERE `id_attribute_group` = ' . $attributeGroupId
-            );
-
+            $query_indexable = $this->database->get_value('SELECT `indexable` ' . 'FROM ' . _DB_PREFIX_ . 'layered_indexable_attribute_group ' . 'WHERE `id_attribute_group` = ' . $attribute_group_id);
+            $is_indexable = (bool) $query_indexable;
+            $result = $this->database->execute_s('SELECT `url_name`, `meta_title`, `id_lang` ' . 'FROM ' . _DB_PREFIX_ . 'layered_indexable_attribute_group_lang_value ' . 'WHERE `id_attribute_group` = ' . $attribute_group_id);
             if (!empty($result) && is_array($result)) {
                 foreach ($result as $data) {
-                    $defaultUrl[$data['id_lang']] = $data['url_name'];
-                    $defaultMetaTitle[$data['id_lang']] = $data['meta_title'];
+                    $default_url[$data['id_lang']] = $data['url_name'];
+                    $default_meta_title[$data['id_lang']] = $data['meta_title'];
                 }
             }
         }
-
-        return [
-            'url_name' => $defaultUrl,
-            'meta_title' => $defaultMetaTitle,
-            'is_indexable' => $isIndexable,
-        ];
+        return ['url_name' => $default_url, 'meta_title' => $default_meta_title, 'is_indexable' => $is_indexable];
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
@@ -19,27 +19,23 @@ declare(strict_types=1);
  * @copyright Since 2007 PrestaShop SA and Contributors
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License 3.0 (AFL-3.0)
  */
-
-namespace PrestaShop\Module\FacetedSearch\Form\Feature;
+namespace Presta_Shop\Module\Faceted_Search\Form\Feature;
 
 use Db;
-use PrestaShopDatabaseException;
-
+use Presta_Shop_Database_Exception;
 /**
  * Provides form data
  */
-class FormDataProvider
+class Form_Data_Provider
 {
     /**
      * @var Db
      */
     private $database;
-
     public function __construct(Db $database)
     {
         $this->database = $database;
     }
-
     /**
      * Fills form data
      *
@@ -47,42 +43,25 @@ class FormDataProvider
      *
      * @throws PrestaShopDatabaseException
      */
-    public function getData(array $params): array
+    public function get_data(array $params): array
     {
-        $defaultUrl = [];
-        $defaultMetaTitle = [];
-        $isIndexable = false;
-
+        $default_url = [];
+        $default_meta_title = [];
+        $is_indexable = false;
         // if params contains id, gets data for edit form
         if (!empty($params['id'])) {
-            $featureId = (int) $params['id'];
-
+            $feature_id = (int) $params['id'];
             // returns false if request failed.
-            $queryIndexable = $this->database->getValue(
-                'SELECT `indexable` ' .
-                'FROM ' . _DB_PREFIX_ . 'layered_indexable_feature ' .
-                'WHERE `id_feature` = ' . $featureId
-            );
-
-            $isIndexable = (bool) $queryIndexable;
-            $result = $this->database->executeS(
-                'SELECT `url_name`, `meta_title`, `id_lang` ' .
-                'FROM ' . _DB_PREFIX_ . 'layered_indexable_feature_lang_value ' .
-                'WHERE `id_feature` = ' . $featureId
-            );
-
+            $query_indexable = $this->database->get_value('SELECT `indexable` ' . 'FROM ' . _DB_PREFIX_ . 'layered_indexable_feature ' . 'WHERE `id_feature` = ' . $feature_id);
+            $is_indexable = (bool) $query_indexable;
+            $result = $this->database->execute_s('SELECT `url_name`, `meta_title`, `id_lang` ' . 'FROM ' . _DB_PREFIX_ . 'layered_indexable_feature_lang_value ' . 'WHERE `id_feature` = ' . $feature_id);
             if (!empty($result) && is_array($result)) {
                 foreach ($result as $data) {
-                    $defaultUrl[$data['id_lang']] = $data['url_name'];
-                    $defaultMetaTitle[$data['id_lang']] = $data['meta_title'];
+                    $default_url[$data['id_lang']] = $data['url_name'];
+                    $default_meta_title[$data['id_lang']] = $data['meta_title'];
                 }
             }
         }
-
-        return [
-            'url' => $defaultUrl,
-            'meta_title' => $defaultMetaTitle,
-            'is_indexable' => $isIndexable,
-        ];
+        return ['url' => $default_url, 'meta_title' => $default_meta_title, 'is_indexable' => $is_indexable];
     }
 }
