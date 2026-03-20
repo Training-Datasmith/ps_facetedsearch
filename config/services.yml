@@ -3,7 +3,7 @@ services:
     public: true
 
   prestashop.module.ps_facetedsearch.constraint.url_segment_validator:
-    class: PrestaShop\Module\FacetedSearch\Constraint\UrlSegmentValidator
+    class: Presta_Shop\Module\Faceted_Search\Constraint\Url_Segment_Validator
     arguments:
       - '@prestashop.adapter.tools'
     tags:
